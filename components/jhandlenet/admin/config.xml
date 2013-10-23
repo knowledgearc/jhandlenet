@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+	<fieldset 
+		name="connection"
+		label="COM_JHANDLENET_CONFIG_CONNECTION_LABEL"
+		description="COM_JHANDLENET_CONFIG_CONNECTION_DESC">
+		<field 
+			name="host" 
+			type="text" 
+			label="COM_JHANDLENET_CONNECTION_HOST_LABEL"
+			description="COM_JHANDLENET_CONNECTION_HOST_DESC" 
+			size="45"/>
+		<field 
+			name="port" 
+			type="text" 
+			label="COM_JHANDLENET_CONNECTION_PORT_LABEL"
+			description="COM_JHANDLENET_CONNECTION_PORT_DESC"
+			size="45"/>
+		<field 
+			name="database" 
+			type="text" 
+			label="COM_JHANDLENET_CONNECTION_DATABASE_LABEL"
+			description="COM_JHANDLENET_CONNECTION_DATABASE_DESC"
+			size="45"/>
+		<field 
+			name="username" 
+			type="text" 
+			label="COM_JHANDLENET_CONNECTION_USERNAME_LABEL"
+			description="COM_JHANDLENET_CONNECTION_USERNAME_DESC"
+			size="45"/>
+		<field 
+			name="password" 
+			type="text" 
+			label="COM_JHANDLENET_CONNECTION_PASSWORD_LABEL"
+			description="COM_JHANDLENET_CONNECTION_PASSWORD_DESC" 
+			size="45"/>
+	</fieldset>
+	<fieldset name="permissions"
+		label="JCONFIG_PERMISSIONS_LABEL"
+		description="JCONFIG_PERMISSIONS_DESC">
+		<field name="rules"
+			type="rules"
+			label="JCONFIG_PERMISSIONS_LABEL"
+			validate="rules"
+			filter="rules"
+			component="com_jhandlenet"
+			section="component"/>
+	</fieldset>
+</config>
