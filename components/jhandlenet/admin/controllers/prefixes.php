@@ -35,7 +35,14 @@ defined('_JEXEC') or die('Restricted access');
  * @package		JHandleNet
  */
 class JHandleNetControllerPrefixes extends JControllerAdmin
-{	
+{
+	public function __construct($config = array())
+	{
+		parent::__construct($config);
+	
+		$this->registerTask('unhome', 'delete');
+	}
+	
 	/**
 	 * Proxy for getModel.
 	 */

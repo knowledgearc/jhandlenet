@@ -216,4 +216,83 @@ class JHandleNetModelPrefix extends JModelAdmin
 	
 		return true;
 	}
+	
+	/**
+	 * Method to delete one records.
+	 *
+	 * @param   array  &$pks  An array of record primary keys. Only the first 
+	 * item is deleted.
+	 *
+	 * @return  boolean  True if successful, false if an error occurs.
+	 *
+	 * @since   11.1
+	 */
+	public function delete(&$pks)
+	{
+		// Initialise variables.
+		$dispatcher = JDispatcher::getInstance();
+		$pks = (array) $pks;
+		$table = $this->getTable();
+	
+		// Include the content plugins for the on delete events.
+		JPluginHelper::importPlugin('content');
+	
+		$pk = JArrayHelper::getValue($pks, 0);
+
+		if ($table->load($pk))
+		{
+
+			if ($this->canDelete($table))
+			{
+
+				$context = $this->option . '.' . $this->name;
+
+				// Trigger the onContentBeforeDelete event.
+				$result = $dispatcher->trigger($this->event_before_delete, array($context, $table));
+				if (in_array(false, $result, true))
+				{
+					$this->setError($table->getError());
+					return false;
+				}
+
+				if (!$table->delete($pk))
+				{
+					$this->setError($table->getError());
+					return false;
+				}
+
+				// Trigger the onContentAfterDelete event.
+				$dispatcher->trigger($this->event_after_delete, array($context, $table));
+
+			}
+			else
+			{
+
+				// Prune items that you can't change.
+				unset($pks[$i]);
+				$error = $this->getError();
+				if ($error)
+				{
+					JError::raiseWarning(500, $error);
+					return false;
+				}
+				else
+				{
+					JError::raiseWarning(403, JText::_('JLIB_APPLICATION_ERROR_DELETE_NOT_PERMITTED'));
+					return false;
+				}
+			}
+
+		}
+		else
+		{
+			$this->setError($table->getError());
+			return false;
+		}
+	
+		// Clear the component's cache
+		$this->cleanCache();
+	
+		return true;
+	}
 }

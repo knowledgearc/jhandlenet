@@ -29,7 +29,8 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-JHtml::_('bootstrap.framework');
+JHtml::_('behavior.tooltip');
+JHtml::_('behavior.formvalidation');
 
 $user = JFactory::getUser();
 ?>

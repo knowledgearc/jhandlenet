@@ -80,7 +80,7 @@ class JHandleNetViewPrefixes extends JViewLegacy
 			}
 	
 			if (count($user->authorise('core.delete', 'com_jhandlenet')) > 0) {
-				JToolbarHelper::deleteList('prefix.unhome');
+				JToolbarHelper::deleteList(JText::_('COM_JHANDLENET_CONFIRM_DELETE'), 'prefixes.delete');
 			}
 		}
 		

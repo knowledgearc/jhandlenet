@@ -52,12 +52,6 @@ class JHandleNetViewPrefix extends JViewLegacy
 		$this->state	= $this->get('State');
 		$this->item		= $this->get('Item');
 		$this->form		= $this->get('Form');
-		
-		// set isNew based on whether the na can be loaded (because it is not 
-		// autoincremented).
-		$table = $this->getModel()->getTable();
-
-		$this->isNew	= $table->exists((int)$this->item->na) ? false : true;
 
 		// Check for errors.
 		if (count($errors = $this->get('Errors'))) {
