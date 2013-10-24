@@ -49,7 +49,7 @@ class JHandleNetModelPrefixes extends JModelList
 		
 		Jlog::addLogger(array('text_file'=>'jhandlenet.php'), JLog::ALL, 'jhandlenet');
 		
-		$params = $this->getState('params');
+		$params = JComponentHelper::getParams('com_jhandlenet');
 
 		$option['driver']   = 'mysqli';
 		$option['host']     = $params->get('host').':'.$params->get('port');
@@ -111,7 +111,7 @@ class JHandleNetModelPrefixes extends JModelList
 	public function getTotal()
 	{
 		$db = $this->getDbo();
-		
+
 		if (!$db->connected()) {
 			return 0;
 		}

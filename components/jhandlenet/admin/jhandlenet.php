@@ -28,10 +28,15 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-JLoader::register('JHandleNetHelper', dirname(__FILE__) . '/helpers/jhandlenet.php');
+$input = JFactory::getApplication()->input;
 
-$JControllerName = 'JControllerLegacy';
+if (!JFactory::getUser()->authorise('core.manage', 'com_jhandlenet'))
+{
+	return JError::raiseWarning(404, JText::_('JERROR_ALERTNOAUTHOR'));
+}
 
-$controller	= $JControllerName::getInstance('jhandlenet');
-$controller->execute(JRequest::getCmd('task'));
+$task = $input->get('task');
+
+$controller	= JControllerLegacy::getInstance('JHandleNet');
+$controller->execute($input->get('task'));
 $controller->redirect();

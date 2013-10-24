@@ -55,10 +55,11 @@ class JHandleNetViewPrefixes extends JViewLegacy
 
 		if (count($errors = $this->get('Errors'))) {
 			JError::raiseError(500, implode("\n", $errors));
+			return false;
 		}
 
 		$this->addToolbar();
-		
+			
 		parent::display($tpl);
 	}
 
@@ -75,11 +76,11 @@ class JHandleNetViewPrefixes extends JViewLegacy
 
 		if (!count($errors = $this->get('Errors')) && $this->get('Dbo')->connected()) {		
 			if (count($user->authorise('core.create', 'com_jhandlenet')) > 0) {
-				JToolbarHelper::addNew('com_jhandle.home');
+				JToolbarHelper::addNew('prefix.home');
 			}
 	
 			if (count($user->authorise('core.delete', 'com_jhandlenet')) > 0) {
-				JToolbarHelper::deleteList('com_jhandle.unhome');
+				JToolbarHelper::deleteList('prefix.unhome');
 			}
 		}
 		

@@ -1,6 +1,6 @@
 <?php
 /**
- * A helper that provides assistance with permissions adn submenus for JHandleNet.
+ * JHandleNet prefix list controller class.
  * 
  * @package		JHandleNet
  * @copyright	Copyright (C) 2013 KnowledgeARC Ltd. All rights reserved.
@@ -23,55 +23,58 @@
  * Contributors
  * Please feel free to add your name and email (optional) here if you have 
  * contributed any source code changes.
- * Name							Email 
+ * Name							Email
  * 
  */
 
 defined('_JEXEC') or die('Restricted access');
 
-class JHandleNetHelper
-{
-	public static $extension = 'com_jhandlenet';
-
+/**
+ * JHandleNet prefix list controller class.
+ *
+ * @package		JHandleNet
+ */
+class JHandleNetControllerPrefixes extends JControllerAdmin
+{	
 	/**
-	 * Configure the Linkbar.
-	 *
-	 * @param string $vName The name of the active view.
-	 *
-	 * @return void
+	 * Proxy for getModel.
 	 */
-	public static function addSubmenu($vName)
+	public function getModel($name = 'Prefix', $prefix = 'JHandleNetModel', $config = array('ignore_request' => true))
 	{
-
+		$model = parent::getModel($name, $prefix, $config);
+		return $model;
 	}
-	
+
 	/**
-	 * Gets a list of the actions that can be performed.
+	 * Method to save the submitted ordering values for records via AJAX.
 	 *
-	 * @param	int		The community ID.
+	 * @return  void
 	 *
-	 * @return	JObject
-	 * @since	1.6
+	 * @since   3.0
 	 */
-	public static function getActions($na = 0)
+	public function saveOrderAjax()
 	{
-		$user	= JFactory::getUser();
-		$result	= new JObject();
-		
-		if (empty($na)) {
-			$assetName = 'com_jhandlenet';
-		} else {
-			$assetName = 'com_jhandlenet.prefix.'.$na;
-		}
-		
-		$level = 'component';
-		
-		$actions = JAccess::getActions($assetName, $level);
+		// Get the input
+		$input = JFactory::getApplication()->input;
+		$pks = $input->post->get('cid', array(), 'array');
+		$order = $input->post->get('order', array(), 'array');
 
-		foreach ($actions as $action) {
-			$result->set($action->name, $user->authorise($action, $assetName));
+		// Sanitize the input
+		JArrayHelper::toInteger($pks);
+		JArrayHelper::toInteger($order);
+
+		// Get the model
+		$model = $this->getModel();
+
+		// Save the ordering
+		$return = $model->saveorder($pks, $order);
+
+		if ($return)
+		{
+			echo "1";
 		}
 
-		return $result;
+		// Close the application
+		JFactory::getApplication()->close();
 	}
 }

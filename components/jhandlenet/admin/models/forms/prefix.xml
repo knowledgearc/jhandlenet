@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fieldset 
+		addfieldpath="/administrator/components/com_jhandlenet/models/fields">
+		<field 
+			name="na" 
+			type="text" 
+			class="inputbox" 
+			label="COM_JHANDLE_PREFIX_NA_LABEL"
+			description="COM_JHANDLE_PREFIX_NA_DESC" 
+			required="true"/>
+
+		<field 
+			name="url" 
+			type="text" 
+			class="inputbox" 
+			label="COM_JHANDLE_PREFIX_URL_LABEL"
+			description="COM_JHANDLE_PREFIX_URL_DESC" 
+			required="true"/>
+	</fieldset>	
+</form>
