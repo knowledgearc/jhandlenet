@@ -34,4 +34,11 @@ class JHandleNetTableNA extends JTable
 	{
 		parent::__construct('nas', 'na', $db);
 	}
+	
+	public function store($updateNulls = false)
+	{
+		$this->_db->insertObject($this->_tbl, $this, $this->_tbl_key);
+		
+		return true;
+	}
 }

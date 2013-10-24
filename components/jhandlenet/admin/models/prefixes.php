@@ -58,7 +58,7 @@ class JHandleNetModelPrefixes extends JModelList
 		$option['database'] = $params->get('database');
 		$option['prefix']   = '';
 
-		$db = JDatabase::getInstance($option);
+		$db = JDatabaseDriver::getInstance($option);
 		parent::setDbo($db);
 		
 		// force a connect so we can use $db->connected.
@@ -91,8 +91,9 @@ class JHandleNetModelPrefixes extends JModelList
 		$query
 			->select($select)
 			->from($db->quoteName('nas') . ' AS a')
-			->join('left', $db->quoteName('handles') . ' AS b ON a.na = b.na');
-	
+			->join('left', $db->quoteName('handles') . ' AS b ON a.na = b.na')
+			->group('na');
+
 		return $query;
 	}
 	

@@ -49,8 +49,7 @@ if (version_compare(JVERSION, "3.0", "l")) {
 	jimport('joomla.environment.uri');
 	jimport('joomla.event.dispatcher');
 	jimport('joomla.utilities.utility');
-	jimport('joomla.utilities.arrayhelper');
-	
+	jimport('joomla.utilities.arrayhelper');	
 }
 
 // System configuration.
@@ -69,6 +68,7 @@ $lang->load('jhandlenet_cli', JPATH_SITE, null, false, false)
 || $lang->load('jhandlenet_cli', JPATH_SITE, null, true);
 
 jimport('joomla.application.component.helper');
+jimport('joomla.log.log');
  
 /**
  * Simple command line interface application class.
@@ -77,10 +77,15 @@ jimport('joomla.application.component.helper');
  */
 class JHandleNet extends JApplicationCli
 {
+	public function __construct($input = null, JRegistry $config = null, JEventDispatcher $dispatcher = null) 
+	{
+		parent::__construct($input, $config, $dispatcher);
+	}
+	
     public function doExecute()
     {
     	if ($this->input->get('h') || $this->input->get('help')) {    		
-    		// put help target here.
+			echo 'help';
     		return;
     	}
     	
@@ -94,12 +99,11 @@ class JHandleNet extends JApplicationCli
 		$config->set('cache_handler', 'file');
 		
 		try {			
-			// put targets here.
-						
+		    if ($this->input->get('home')) {
+    			$this->home($this->input->get('home'), JArrayHelper::getValue($this->input->args, 0));
+	    	}
 		} catch (Exception $e) {
-			if ($this->input->get('q', null) || $this->input->get('quiet', null)) {
-				$this->out($e->getMessage());
-			}
+			$this->out('ERROR: '.$e->getMessage());			
 		}
     }
     
@@ -112,9 +116,44 @@ class JHandleNet extends JApplicationCli
     	return $this;
     }
     
-    public function home()
+    public function home($na, $url)
     {
+    	if (!$na) {
+    		$this->out('No naming authority specified.');
+    		return;    		
+    	}
     	
+    	if (!$url) {
+    		$this->out('No url specified');
+    		return;
+    	}
+    	
+    	$params = JComponentHelper::getParams('com_jhandlenet');
+    	
+    	$option['driver']   = 'mysqli';
+    	$option['host']     = $params->get('host').':'.$params->get('port');
+    	$option['user']     = $params->get('username');
+    	$option['password'] = $params->get('password');
+    	$option['database'] = $params->get('database');
+    	$option['prefix']   = '';
+    	
+    	$db = JDatabaseDriver::getInstance($option);
+
+    	JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_jhandlenet/tables');
+    	$table = JTable::getInstance('NA', 'JHandleNetTable', array('dbo'=>$db));
+
+    	if ($table->load($na)) {
+    		$this->out(JText::sprintf('Cannot home handle prefix %s. Already exists.', $na));
+    	} else {
+    		$table->na = $na;
+    		$table->url = $url;
+    		
+    		if ($table->store()) {
+    			if ($this->input->get('v') || $this->input->get('verbose')) {
+    				$this->out(JText::sprintf('Handle prefix %s homed.', $na));
+    			}
+    		}
+    	}
     }
 }
  
