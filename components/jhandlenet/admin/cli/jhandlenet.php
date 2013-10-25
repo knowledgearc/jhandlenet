@@ -77,9 +77,25 @@ jimport('joomla.log.log');
  */
 class JHandleNet extends JApplicationCli
 {
+	private $db;
+	
 	public function __construct($input = null, JRegistry $config = null, JEventDispatcher $dispatcher = null) 
 	{
 		parent::__construct($input, $config, $dispatcher);
+		
+		
+		$params = JComponentHelper::getParams('com_jhandlenet');
+		
+		$option['driver']   = 'mysqli';
+		$option['host']     = $params->get('host').':'.$params->get('port');
+		$option['user']     = $params->get('username');
+		$option['password'] = $params->get('password');
+		$option['database'] = $params->get('database');
+		$option['prefix']   = '';
+		
+		$db = JDatabaseDriver::getInstance($option);
+		
+		$this->setDbo($db);
 	}
 	
     public function doExecute()
@@ -101,6 +117,12 @@ class JHandleNet extends JApplicationCli
 		try {			
 		    if ($this->input->get('home')) {
     			$this->home($this->input->get('home'), JArrayHelper::getValue($this->input->args, 0));
+    			return;
+	    	}
+	    	
+	    	if ($this->input->get('unhome')) {
+	    		$this->unhome($this->input->get('unhome'));
+	    		return;
 	    	}
 		} catch (Exception $e) {
 			$this->out('ERROR: '.$e->getMessage());			
@@ -120,40 +142,64 @@ class JHandleNet extends JApplicationCli
     {
     	if (!$na) {
     		$this->out('No naming authority specified.');
-    		return;    		
+    		return;
     	}
-    	
+    	 
     	if (!$url) {
     		$this->out('No url specified');
     		return;
     	}
-    	
-    	$params = JComponentHelper::getParams('com_jhandlenet');
-    	
-    	$option['driver']   = 'mysqli';
-    	$option['host']     = $params->get('host').':'.$params->get('port');
-    	$option['user']     = $params->get('username');
-    	$option['password'] = $params->get('password');
-    	$option['database'] = $params->get('database');
-    	$option['prefix']   = '';
-    	
-    	$db = JDatabaseDriver::getInstance($option);
-
-    	JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_jhandlenet/tables');
-    	$table = JTable::getInstance('NA', 'JHandleNetTable', array('dbo'=>$db));
-
+    
+    	$table = $this->getTable();
+    
     	if ($table->load($na)) {
     		$this->out(JText::sprintf('Cannot home handle prefix %s. Already exists.', $na));
     	} else {
     		$table->na = $na;
     		$table->url = $url;
-    		
+    
     		if ($table->store()) {
     			if ($this->input->get('v') || $this->input->get('verbose')) {
     				$this->out(JText::sprintf('Handle prefix %s homed.', $na));
     			}
     		}
     	}
+    }
+    
+    public function unhome($na)
+    {
+    	if (!$na) {
+    		$this->out('No naming authority specified.');
+    		return;
+    	}
+
+		$table = $this->getTable();
+    	
+    	if ($table->load($na)) {    		
+    		if ($table->delete()) {
+    			if ($this->input->get('v') || $this->input->get('verbose')) {
+    				$this->out(JText::sprintf('Handle prefix %s unhomed.', $na));
+    			}
+    		}
+    	} else {
+    		$this->out(JText::sprintf("Cannot unhome handle prefix %s. Prefix doesn't exists.", $na));
+    	}
+    }
+    
+    public function setDbo($db)
+    {
+    	$this->db = $db;
+    }
+    
+    public function getDbo()
+    {
+    	return $this->db;
+    }
+    
+    public function getTable()
+    {
+    	JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_jhandlenet/tables');
+    	return JTable::getInstance('NA', 'JHandleNetTable', array('dbo'=>$this->getDbo()));
     }
 }
  

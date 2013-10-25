@@ -19,6 +19,7 @@ create table handles (
     pub_write bool,
     na varchar(255) not null,
     PRIMARY KEY(handle, idx),
-    FOREIGN KEY (na)
-        REFERENCES nas(na)
+    FOREIGN KEY (na) REFERENCES nas(na)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
 );
