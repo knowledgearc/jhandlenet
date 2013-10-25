@@ -143,13 +143,36 @@ class JHandleNet extends JApplicationCli
 	    	}
 	    	
 	    	// rebuild prefix handle index.
-	    	if ($this->input->get('rebuild')) {
-	    		$this->rebuild($this->input->get('rebuild'));
+	    	if ($this->input->get('r') || $this->input->get('rebuild')) {
+	    		$na = 
+	    			$this->input->get('rebuild') ? 
+	    				$this->input->get('rebuild') : 
+	    				$this->input->get('r'); 
+	    		
+	    		$this->rebuild($na);
+	    		return;
 	    	}
 	    	
 	    	// purge handles for prefix.
-	    	if ($this->input->get('purge')) {
-	    		$this->purge($this->input->get('purge'));
+	    	if ($this->input->get('p') || $this->input->get('purge')) {
+	    		$na =
+	    			$this->input->get('purge') ?
+	    				$this->input->get('purge') :
+	    				$this->input->get('p');
+	    		
+	    		$this->purge($na);
+	    		return;
+	    	}
+	    	
+	    	// update handles for prefix, creating handles for new records.
+	    	if ($this->input->get('u') || $this->input->get('update')) {
+	    		$na =
+	    			$this->input->get('update') ?
+	    				$this->input->get('update') :
+	    				$this->input->get('u');
+	    		
+	    		$this->update($na);
+	    		return;
 	    	}
 		} catch (Exception $e) {
 			$this->out('ERROR: '.$e->getMessage());			
@@ -231,6 +254,26 @@ class JHandleNet extends JApplicationCli
     	 
     	try {
     		$dispatcher->trigger('onHandlesCreate', array($na));
+    	} catch (Exception $e) {
+    		if ($this->input->get('q', false) || $this->input->get('quiet', false)) {
+    			$this->out($e->getMessage());
+    		}
+    	}
+    }
+    
+    public function update($na)
+    {
+    	if (!$na) {
+    		$this->out('Cannot update handles using an empty prefix.');
+    		return;
+    	}
+    	 
+    	$dispatcher = JDispatcher::getInstance();
+
+    	JPluginHelper::importPlugin("jhandlenet", null, true, $dispatcher);
+    	
+    	try {
+    		$dispatcher->trigger('onHandlesUpdate', array($na));
     	} catch (Exception $e) {
     		if ($this->input->get('q', false) || $this->input->get('quiet', false)) {
     			$this->out($e->getMessage());

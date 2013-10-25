@@ -104,47 +104,37 @@ class PlgJHandleNetDSpace extends JPlugin
 		
 		$db = $this->_getNA()->getDbo();
 		
-		$items = $this->getItems();
-		
-		$array = array();
-		
-		foreach ($items as $item) {
-			$handle = $item->handle;
-			$handle = JArrayHelper::getValue(explode('/', $handle), 1);
-			$handle = $na.'/'.$handle;
-			
-			$id = $item->{"search.resourceid"};
-			
-			$row = array();
-			
-			$row[] = "'$handle'";	// handle
-			$row[] = "1";			// idx (always 1 for this type of handle)
-			$row[] = "'URL'";		// type (always URL) 
-			$row[] = "'$id'"; 		// data (should only be the id of the actual item)
-			$row[] = '0';			// ttl_type (always 0)
-			$row[] = '86400';		// ttl
-			$row[] = 'NOW()';		// timestamp (NOW())
-			$row[] = "''";			// refs (empty string)
-			$row[] = '1';			// admin_read (always 1)
-			$row[] = '0'; 			// admin_write (should be 0 to stop handle.net writing to the db)
-			$row[] = '1'; 			// pub_read (always 1)
-			$row[] = '0';			// pub_write (always 0)
-			$row[] = "'$na'";		// na
-			
-			$array[] = implode(',',$row);
-			
-			if (count($array) == count($items) || count($array) == static::$chunk) {
-				$query = $db->getQuery(true);
-				$query
-					->insert('handles')
-					->values($array);
-				
-				$db->setQuery($query);
-				$db->execute();
-
-				$array = array();
-			}
+		$this->_insert($this->getItems());
+	}
+	
+	public function onHandlesUpdate($na)
+	{
+		if (!$this->_getNA()->load($na)) {
+			throw new Exception('No such naming authority.');
 		}
+		
+		if (!class_exists('JSpaceFactory')) {
+			throw new Exception('JSpace library not installed.');
+		}
+		
+		$this->_setConnector($this->_getNA());
+		
+		$db = $this->_getNA()->getDbo();
+		
+		$query = $db->getQuery(true);
+		$query
+			->select('MAX(data)')
+			->from('handles');
+		
+		$db->setQuery($query);
+
+		$filters = array();
+
+		if (($max = $db->loadResult()) !== null) {
+			$filters[] = "search.resourceid:[".($max+1)." TO *]";
+		}
+
+		$this->_insert($this->getItems());
 	}
 	
 	/**
@@ -152,7 +142,7 @@ class PlgJHandleNetDSpace extends JPlugin
 	 *
 	 * @return array A list of DSpace items.
 	 */
-	protected function getItems($start = 0, $limit = null)
+	protected function getItems($start = 0, $limit = null, $filters = array())
 	{
 		$items = array();
 	
@@ -160,11 +150,14 @@ class PlgJHandleNetDSpace extends JPlugin
 			$items = array();
 				
 			$connector = $this->_getConnector();
-	
+			
+			$fq = array(); 
+			$fq[] = 'search.resourcetype:2';
+			$fq = array_merge($fq, $filters);
+
 			$vars = array();
 			$vars['q'] = '*:*';
 			$vars['fl'] = 'search.resourceid,handle';
-			$vars['fq'] = 'search.resourcetype:2';
 			$vars['start'] = $start;
 			
 			if ($limit) {
@@ -172,14 +165,11 @@ class PlgJHandleNetDSpace extends JPlugin
 			} else {
 				$vars['rows'] = '2147483647';
 			}
-	
-			if ($lastModified = JArrayHelper::getValue($this->get('indexOptions'), 'lastModified', null, 'string')) {
-				$lastModified = JFactory::getDate($lastModified)->format('Y-m-d\TH:i:s\Z', false);
-	
-				$vars['q'] = urlencode("SolrIndexer.lastIndexed:[$lastModified TO NOW]");
-			}
-	
-			$response = json_decode($connector->get(JSpaceFactory::getEndpoint('/discover.json', $vars)));
+		
+			// for some reason we have to url encode here. Looks like the JSpace connector has some bugs.
+			$vars['fq'] = rawurlencode(implode(' AND ', $fq));
+
+			$response = json_decode($connector->get(JSpaceFactory::getEndpoint('/discover.json', $vars), false));
 
 			if (isset($response->response->docs)) {
 				$items = $response->response->docs;
@@ -189,5 +179,52 @@ class PlgJHandleNetDSpace extends JPlugin
 		}
 	
 		return $items;
+	}
+	
+	private function _insert($items)
+	{
+		$na = $this->_getNA();
+		
+		$db = $na->getDbo();
+		
+		$array = array();
+		
+		foreach ($items as $item) {
+			$handle = $item->handle;
+			$handle = JArrayHelper::getValue(explode('/', $handle), 1);
+			$handle = $na->na.'/'.$handle;
+				
+			$id = $item->{"search.resourceid"};
+				
+			$row = array();
+				
+			$row[] = "'$handle'";	// handle
+			$row[] = "1";			// idx (always 1 for this type of handle)
+			$row[] = "'URL'";		// type (always URL)
+			$row[] = "'$id'"; 		// data (should only be the id of the actual item)
+			$row[] = '0';			// ttl_type (always 0)
+			$row[] = '86400';		// ttl
+			$row[] = 'NOW()';		// timestamp (NOW())
+			$row[] = "''";			// refs (empty string)
+			$row[] = '1';			// admin_read (always 1)
+			$row[] = '0'; 			// admin_write (should be 0 to stop handle.net writing to the db)
+			$row[] = '1'; 			// pub_read (always 1)
+			$row[] = '0';			// pub_write (always 0)
+			$row[] = "'".$na->na."'";	// na
+				
+			$array[] = implode(',',$row);
+				
+			if (count($array) == count($items) || count($array) == static::$chunk) {
+				$query = $db->getQuery(true);
+				$query
+				->insert('handles')
+				->values($array);
+		
+				$db->setQuery($query);
+				$db->execute();
+		
+				$array = array();
+			}
+		}
 	}
 }

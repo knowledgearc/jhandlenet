@@ -11,7 +11,7 @@ create table handles (
     `handle` varchar(255) not null,
     `idx` int not null,
     `type` blob,
-    `data` blob,
+    `data` int,
     `ttl_type` int,
     `ttl` int,
     `timestamp` int,
