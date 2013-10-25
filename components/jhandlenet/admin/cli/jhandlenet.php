@@ -114,7 +114,8 @@ class JHandleNet extends JApplicationCli
 		$config->set('caching', 0);
 		$config->set('cache_handler', 'file');
 		
-		try {			
+		try {
+			// home a prefix
 		    if ($this->input->get('home')) {
 		    	$username = 
 		    		$this->input->get('username', null, 'username') ? 
@@ -135,9 +136,20 @@ class JHandleNet extends JApplicationCli
     			return;
 	    	}
 	    	
+	    	// unhome a prefix
 	    	if ($this->input->get('unhome')) {
 	    		$this->unhome($this->input->get('unhome'));
 	    		return;
+	    	}
+	    	
+	    	// rebuild prefix handle index.
+	    	if ($this->input->get('rebuild')) {
+	    		$this->rebuild($this->input->get('rebuild'));
+	    	}
+	    	
+	    	// purge handles for prefix.
+	    	if ($this->input->get('purge')) {
+	    		$this->purge($this->input->get('purge'));
 	    	}
 		} catch (Exception $e) {
 			$this->out('ERROR: '.$e->getMessage());			
@@ -202,6 +214,48 @@ class JHandleNet extends JApplicationCli
     	} else {
     		$this->out(JText::sprintf("Cannot unhome handle prefix %s. Prefix doesn't exists.", $na));
     	}
+    }
+    
+    public function rebuild($na)
+    {
+    	if (!$na) {
+    		$this->out('Cannot rebuild handles using an empty prefix.');
+    		return;
+    	}
+    	
+    	$this->purge($na);
+    	
+    	$dispatcher = JDispatcher::getInstance();
+    	
+    	JPluginHelper::importPlugin("jhandlenet", null, true, $dispatcher);
+    	 
+    	try {
+    		$dispatcher->trigger('onHandlesCreate', array($na));
+    	} catch (Exception $e) {
+    		if ($this->input->get('q', false) || $this->input->get('quiet', false)) {
+    			$this->out($e->getMessage());
+    		}
+    	}
+    }
+    
+    
+    public function purge($na)
+    {
+    	if (!$na) {
+    		$this->out('No prefix to purge.');
+    		return;
+    	}
+    	
+    	$db = $this->getDbo();
+    	
+    	$query = $db->getQuery(true);
+    	
+    	$query
+    		->delete('handles')
+    		->where('na='.$na);
+    	
+    	$db->setQuery($query);
+    	$db->execute();
     }
     
     public function setDbo($db)
