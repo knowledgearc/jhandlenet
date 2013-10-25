@@ -116,7 +116,22 @@ class JHandleNet extends JApplicationCli
 		
 		try {			
 		    if ($this->input->get('home')) {
-    			$this->home($this->input->get('home'), JArrayHelper::getValue($this->input->args, 0));
+		    	$username = 
+		    		$this->input->get('username', null, 'username') ? 
+		    			$this->input->get('username', 'username') : 
+		    			$this->input->get('u', null, 'username');
+		    	
+		    	$password = 
+		    		$this->input->get('password', null, 'string') ? 
+		    			$this->input->get('password', 'string') : 
+		    			$this->input->get('p', null, 'string');
+
+    			$this->home(
+    				$this->input->get('home', null, 'string'),
+    				JArrayHelper::getValue($this->input->args, 0),
+    				$this->input->get('archive', null, 'string'),
+    				$username,
+    				$password);
     			return;
 	    	}
 	    	
@@ -138,7 +153,7 @@ class JHandleNet extends JApplicationCli
     	return $this;
     }
     
-    public function home($na, $url)
+    public function home($na, $url, $endpoint = null, $username = null, $password = null)
     {
     	if (!$na) {
     		$this->out('No naming authority specified.');
@@ -157,6 +172,9 @@ class JHandleNet extends JApplicationCli
     	} else {
     		$table->na = $na;
     		$table->url = $url;
+    		$table->archive_endpoint = $endpoint;
+    		$table->archive_username = $username;
+    		$table->archive_password = $password;
     
     		if ($table->store()) {
     			if ($this->input->get('v') || $this->input->get('verbose')) {

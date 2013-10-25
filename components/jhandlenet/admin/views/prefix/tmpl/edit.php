@@ -63,6 +63,33 @@ Joomla.submitbutton = function(task)
 					<?php echo $this->form->getInput('url'); ?>
 				</div>
 			</div>
+			
+			<div class="control-group">
+				<div class="control-label">
+					<?php echo $this->form->getLabel('archive_endpoint'); ?>
+				</div>
+				<div class="controls">
+					<?php echo $this->form->getInput('archive_endpoint'); ?>
+				</div>
+			</div>
+			
+			<div class="control-group">
+				<div class="control-label">
+					<?php echo $this->form->getLabel('archive_username'); ?>
+				</div>
+				<div class="controls">
+					<?php echo $this->form->getInput('archive_username'); ?>
+				</div>
+			</div>
+			
+			<div class="control-group">
+				<div class="control-label">
+					<?php echo $this->form->getLabel('archive_password'); ?>
+				</div>
+				<div class="controls">
+					<?php echo $this->form->getInput('archive_password'); ?>
+				</div>
+			</div>
 		</fieldset>
 	</div>
 	
