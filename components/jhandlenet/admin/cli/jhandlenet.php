@@ -99,12 +99,7 @@ class JHandleNet extends JApplicationCli
 	}
 	
     public function doExecute()
-    {
-    	if ($this->input->get('h') || $this->input->get('help')) {    		
-			echo 'help';
-    		return;
-    	}
-    	
+    { 	
     	// fool the system into thinking we are running as JSite with JHandleNet as the active component
 		JFactory::getApplication('site');
 		$_SERVER['HTTP_HOST'] = 'domain.com';
@@ -117,15 +112,10 @@ class JHandleNet extends JApplicationCli
 		try {
 			// home a prefix
 		    if ($this->input->get('home')) {
-		    	$username = 
-		    		$this->input->get('username', null, 'username') ? 
-		    			$this->input->get('username', 'username') : 
-		    			$this->input->get('u', null, 'username');
+		    	$username = $this->input->get('username', null, 'string');
+
 		    	
-		    	$password = 
-		    		$this->input->get('password', null, 'string') ? 
-		    			$this->input->get('password', 'string') : 
-		    			$this->input->get('p', null, 'string');
+		    	$password = $this->input->get('password', null, 'string');
 
     			$this->home(
     				$this->input->get('home', null, 'string'),
@@ -144,10 +134,7 @@ class JHandleNet extends JApplicationCli
 	    	
 	    	// rebuild prefix handle index.
 	    	if ($this->input->get('r') || $this->input->get('rebuild')) {
-	    		$na = 
-	    			$this->input->get('rebuild') ? 
-	    				$this->input->get('rebuild') : 
-	    				$this->input->get('r'); 
+	    		$na = $this->input->get('r', $this->input->get('rebuild'));
 	    		
 	    		$this->rebuild($na);
 	    		return;
@@ -155,25 +142,37 @@ class JHandleNet extends JApplicationCli
 	    	
 	    	// purge handles for prefix.
 	    	if ($this->input->get('p') || $this->input->get('purge')) {
-	    		$na =
-	    			$this->input->get('purge') ?
-	    				$this->input->get('purge') :
-	    				$this->input->get('p');
-	    		
+	    		$na = $this->input->get('p', $this->input->get('purge'));
 	    		$this->purge($na);
 	    		return;
 	    	}
 	    	
 	    	// update handles for prefix, creating handles for new records.
 	    	if ($this->input->get('u') || $this->input->get('update')) {
-	    		$na =
-	    			$this->input->get('update') ?
-	    				$this->input->get('update') :
-	    				$this->input->get('u');
-	    		
+	    		$na = $this->input->get('u', $this->input->get('update'));
 	    		$this->update($na);
 	    		return;
 	    	}
+	    	
+	    	
+	    	// clean handles for prefix, clean handles for records that don't 
+	    	//exist.
+	    	if ($this->input->get('c') || $this->input->get('clean')) {
+	    		$na = $this->input->get('c', $this->input->get('clean'));	    		 
+	    		$this->update($na);
+	    		return;
+	    	}
+	    	
+			// build handles for prefix, creating handles for new records and 
+			// cleaning non-existent handles.
+	    	if ($this->input->get('b') || $this->input->get('build')) {
+	    		$na = $this->input->get('b', $this->input->get('build'));	    		 
+	    		$this->build($na);
+	    		return;
+	    	}
+	    	
+	    	// help/catchall
+	    	$this->help();	    	
 		} catch (Exception $e) {
 			$this->out('ERROR: '.$e->getMessage());			
 		}
@@ -247,17 +246,11 @@ class JHandleNet extends JApplicationCli
     	}
     	
     	$this->purge($na);
-    	
-    	$dispatcher = JDispatcher::getInstance();
-    	
-    	JPluginHelper::importPlugin("jhandlenet", null, true, $dispatcher);
-    	 
+
     	try {
-    		$dispatcher->trigger('onHandlesCreate', array($na));
-    	} catch (Exception $e) {
-    		if ($this->input->get('q', false) || $this->input->get('quiet', false)) {
-    			$this->out($e->getMessage());
-    		}
+    		$this->_fireEvent('onHandlesCreate', array($na));
+    	} catch (Exception $e) {    		
+    		$this->out($e->getMessage());
     	}
     }
     
@@ -267,20 +260,27 @@ class JHandleNet extends JApplicationCli
     		$this->out('Cannot update handles using an empty prefix.');
     		return;
     	}
-    	 
-    	$dispatcher = JDispatcher::getInstance();
 
-    	JPluginHelper::importPlugin("jhandlenet", null, true, $dispatcher);
-    	
     	try {
-    		$dispatcher->trigger('onHandlesUpdate', array($na));
+    		$this->_fireEvent('onHandlesUpdate', array($na));
     	} catch (Exception $e) {
-    		if ($this->input->get('q', false) || $this->input->get('quiet', false)) {
-    			$this->out($e->getMessage());
-    		}
+    		$this->out($e->getMessage());
     	}
     }
     
+    public function clean($na)
+    {
+    	if (!$na) {
+    		$this->out('Cannot update clean using an empty prefix.');
+    		return;
+    	}
+
+    	try {
+    		$this->_fireEvent('onHandlesClean', array($na));
+    	} catch (Exception $e) {
+    		$this->out($e->getMessage());
+    	}
+    }    
     
     public function purge($na)
     {
@@ -301,6 +301,34 @@ class JHandleNet extends JApplicationCli
     	$db->execute();
     }
     
+    public function help()
+    {
+echo <<<EOT
+Usage: jhandlenet [options] arg na
+   jhandlenet [options] --home na [param]=[value] url
+
+Manage handles within a universal handle.net database.
+When homing a naming authority use the Homing parameters to specify additional 
+homing-specific settings. 
+   
+  -b, --build         Equivalent of running --clean then --update.
+  -c, --clean         Clean out orphaned handles from the handle.net database.
+  -h, --help          Display this help and exit.
+  --home              Home (create) a naming authority.
+  -p, --purge         Purge all handles for a particular naming authority.
+  -q, --quiet         Suppress all output.
+  -r, --rebuild       Delete handles then re-create.
+  --unhome            Unhome (delete) a naming authority.
+  -u, --update        Create handles that don't exist.
+  -v, --verbose       Display verbose information about the current action.
+Homing:
+  --archive           Specify an archive.
+  --username          Specify the archive username (if applicable).
+  --password          Specify the archive password (if applicable).
+
+EOT;
+    }
+    
     public function setDbo($db)
     {
     	$this->db = $db;
@@ -309,6 +337,15 @@ class JHandleNet extends JApplicationCli
     public function getDbo()
     {
     	return $this->db;
+    }
+    
+    private function _fireEvent($name, $args = array())
+    {
+    	$dispatcher = JDispatcher::getInstance();
+    	 
+    	JPluginHelper::importPlugin("jhandlenet", null, true, $dispatcher);
+
+    	return $dispatcher->trigger($name, $args);
     }
     
     public function getTable()
