@@ -3,8 +3,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 /**
 * A plugin for creating handles from DSpace.
  *
- * @package     JSolr.Plugins
- * @subpackage  Search
+ * @package     JHandleNet.Plugins
  * @copyright   Copyright (C) 2013 Wijiti Pty Ltd. All rights reserved.
  * @license     This file is part of the JHandleNet DSpace plugin for Joomla!.
  *
@@ -137,6 +136,57 @@ class PlgJHandleNetDSpace extends JPlugin
 		$this->_insert($this->getItems());
 	}
 	
+	public function onHandlesClean($na)
+	{
+		if (!$this->_getNA()->load($na)) {
+			throw new Exception('No such naming authority.');
+		}
+		
+		if (!class_exists('JSpaceFactory')) {
+			throw new Exception('JSpace library not installed.');
+		}
+		
+		$this->_setConnector($this->_getNA());
+		
+		$table = $this->_getNA();
+		
+		$db = $table->getDbo();
+		
+		$array = array();
+		
+		$query = $db->getQuery(true);
+		$query
+		->select('na, handle')
+		->from('handles')
+		->order('handle asc');
+		
+		$db->setQuery($query);
+		
+		$filters = array();
+		
+		$items = $this->getItem();
+		
+		// @todo Need a better search algorithm?
+		foreach ($db->loadObjectList() as $row) {
+			$found = false;
+			$handle = $na->na.'/'.$item->handle;			
+			
+			reset($items);
+			
+			while ($item = current($items) && !$found) {
+				$found = ($handle == $item->handle);					
+				next($items);
+			}
+			
+			if (!$found) {
+				$query = $db->getQuery(true);
+				$query
+				->delete('handles')
+				->where("handle = '".$handle."'");
+			}
+		}	
+	}
+	
 	/**
 	 * Gets all DSpace items using the JSpace component and DSpace REST API.
 	 *
@@ -165,6 +215,8 @@ class PlgJHandleNetDSpace extends JPlugin
 			} else {
 				$vars['rows'] = '2147483647';
 			}
+			
+			$vars['sort'] = 'handle asc';
 		
 			// for some reason we have to url encode here. Looks like the JSpace connector has some bugs.
 			$vars['fq'] = rawurlencode(implode(' AND ', $fq));

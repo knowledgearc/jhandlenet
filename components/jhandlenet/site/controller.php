@@ -1,7 +1,8 @@
 <?php
 /**
- * A script for intercepting calls to this component and handling them appropriately.
+ * JHandleNet master display controller.
  * 
+ * @package		JHandleNet
  * @copyright	Copyright (C) 2013 KnowledgeARC Ltd. All rights reserved.
  * @license     This file is part of the JHandleNet component for Joomla!.
 
@@ -27,8 +28,37 @@
  */
 defined('_JEXEC') or die;
 
-require_once JPATH_COMPONENT.'/helpers/route.php';
+/**
+ * JHandleNet Component Controller
+ *
+ * @package     JHandleNet
+ */
+class JHandleNetController extends JControllerLegacy
+{
+	public function resolve()
+	{
+		$handle = JFactory::getApplication()->input->getString('handle');
+		
+		$item = $this->getModel('Handle')->getItem($handle);
 
-$controller     = JControllerLegacy::getInstance('JHandleNet');
-$controller->execute(JFactory::getApplication()->input->get('task'));
-$controller->redirect();
+		if (isset($item->data)) {
+			JFactory::getApplication()->redirect($item->url.'/index.php?option=com_jspace&task=resolve&id='.$item->data);
+		} else {
+			JError::raiseWarning(404, JText::_('COM_JHANDLENET_ORPHANED_HANDLE'));
+		}
+	}
+	
+	/**
+	 * Method to display a view.
+	 *
+	 * @param   boolean			If true, the view output will be cached
+	 * @param   array  An array of safe url parameters and their variable types, for valid values see {@link JFilterInput::clean()}.
+	 *
+	 * @return  JController		This object to support chaining.
+	 */
+	public function display($cachable = false, $urlparams = false)
+	{
+		// At the moment we only have one task; resolve.
+		$this->resolve();
+	}
+}
