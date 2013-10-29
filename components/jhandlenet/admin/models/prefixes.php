@@ -62,7 +62,11 @@ class JHandleNetModelPrefixes extends JModelList
 		parent::setDbo($db);
 		
 		// force a connect so we can use $db->connected.
-		$db->connect();
+		try {
+			$db->connect();
+		} catch (Exception $e) {
+			// ignore connection error and continue.
+		}
 	}
 	
 	/**
@@ -101,21 +105,29 @@ class JHandleNetModelPrefixes extends JModelList
 	{
 		$db = $this->getDbo();
 		
-		if (!$db->connected()) {
+		try {
+			if ($db->connected()) {
+				return parent::getItems();
+			}				
+		} catch (Exception $e) {
 			return array();
 		}
 
-		return parent::getItems();
+		return array();
 	}
 	
 	public function getTotal()
 	{
 		$db = $this->getDbo();
 
-		if (!$db->connected()) {
+		try {
+			if ($db->connected()) {
+				return parent::getTotal();
+			}				
+		} catch (Exception $e) {
 			return 0;
 		}
 
-		return parent::getTotal();
+		return 0;
 	}
 }

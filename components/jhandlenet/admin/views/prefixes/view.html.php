@@ -68,12 +68,14 @@ class JHandleNetViewPrefixes extends JViewLegacy
 	 */
 	protected function addToolbar()
 	{
+		JToolbarHelper::title(JText::_('COM_JHANDLENET_MANAGER_PREFIXES'), 'banners.png');
+		
 		$user = JFactory::getUser();
 
 		$bar = JToolBar::getInstance('toolbar');
 
 		$canDo = JHandleNetHelper::getActions();
-
+		
 		if (!count($errors = $this->get('Errors')) && $this->get('Dbo')->connected()) {		
 			if (count($user->authorise('core.create', 'com_jhandlenet')) > 0) {
 				JToolbarHelper::addNew('prefix.home');
