@@ -33,15 +33,18 @@ jimport('joomla.filesystem.folder');
 jimport('joomla.filesystem.file');
 
 class com_JHandleNetInstallerScript
-{	
-	public function install(JAdapterInstance $adapter)
+{
+	public function postflight($type, $adapter)
 	{
-		$src = $adapter->getParent()->getPath('source').'/admin/cli/jhandlenet.php';
+		error_log(print_r($adapter->getParent(),1));
+		$src = $adapter->getParent()->getPath('extension_administrator').'/cli/jhandlenet.php';
 		
-		$cli = JPATH_ROOT.'/cli/';
-		
+		$cli = JPATH_ROOT.'/cli/jhandlenet.php';
+
 		if (JFile::exists($src)) {
-			JFile::move($src, $cli);
+			if (JFile::move($src, $cli)) {
+				JFolder::delete($adapter->getParent()->getPath('extension_administrator').'/cli');
+			}
 		}
 	}
 	
