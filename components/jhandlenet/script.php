@@ -54,9 +54,9 @@ class com_JHandleNetInstallerScript
 	
 		if (JFile::exists($src)){
 			if (JFile::delete($src)) {
-				echo "<p>Crawler uninstalled from ".$src." successfully.</p>";
+				echo "<p>JHandleNet uninstalled from ".$src." successfully.</p>";
 			} else {
-				echo "<p>Could not uninstall crawler from ".$src.". You will need to manually remove it.</p>";
+				echo "<p>Could not uninstall jhandlenet from ".$src.". You will need to manually remove it.</p>";
 			}
 		}
 	}	
