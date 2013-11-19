@@ -73,7 +73,7 @@ class JHandleNetViewPrefix extends JViewLegacy
 		$user		= JFactory::getUser();
 		$canDo		= JHandleNetHelper::getActions(0);
 
-		JToolbarHelper::title($this->isNew ? JText::_('COM_JHANDLENET_MANAGER_PREFIX_NEW') : JText::_('COM_JHANDLENET_MANAGER_PREFIX_EDIT'), 'banners.png');
+		JToolbarHelper::title(JText::_('COM_JHANDLENET_MANAGER_PREFIX_NEW'), 'banners.png');
 
 		// If not checked out, can save the item.
 		if ($canDo->get('core.edit')) {
