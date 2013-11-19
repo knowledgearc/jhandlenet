@@ -159,15 +159,7 @@ class JHandleNet extends JApplicationCli
 	    	//exist.
 	    	if ($this->input->get('c') || $this->input->get('clean')) {
 	    		$na = $this->input->get('c', $this->input->get('clean'));	    		 
-	    		$this->update($na);
-	    		return;
-	    	}
-	    	
-			// build handles for prefix, creating handles for new records and 
-			// cleaning non-existent handles.
-	    	if ($this->input->get('b') || $this->input->get('build')) {
-	    		$na = $this->input->get('b', $this->input->get('build'));	    		 
-	    		$this->build($na);
+	    		$this->clean($na);
 	    		return;
 	    	}
 	    	
@@ -310,8 +302,7 @@ Usage: jhandlenet [options] arg na
 Manage handles within a universal handle.net database.
 When homing a naming authority use the Homing parameters to specify additional 
 homing-specific settings. 
-   
-  -b, --build         Equivalent of running --clean then --update.
+
   -c, --clean         Clean out orphaned handles from the handle.net database.
   -h, --help          Display this help and exit.
   --home              Home (create) a naming authority.
