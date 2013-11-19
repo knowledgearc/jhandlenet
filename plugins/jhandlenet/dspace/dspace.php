@@ -133,7 +133,7 @@ class PlgJHandleNetDSpace extends JPlugin
 			$filters[] = "search.resourceid:[".($max+1)." TO *]";
 		}
 
-		$this->_insert($this->getItems());
+		$this->_insert($this->getItems(0, null, $filters));
 	}
 	
 	public function onHandlesClean($na)
@@ -215,17 +215,17 @@ class PlgJHandleNetDSpace extends JPlugin
 			} else {
 				$vars['rows'] = '2147483647';
 			}
-			
-			$vars['sort'] = 'handle asc';
-		
+
 			// for some reason we have to url encode here. Looks like the JSpace connector has some bugs.
+			$vars['sort'] = rawurlencode('handle asc');
+		
 			$vars['fq'] = rawurlencode(implode(' AND ', $fq));
 
 			$response = json_decode($connector->get(JSpaceFactory::getEndpoint('/discover.json', $vars), false));
 
 			if (isset($response->response->docs)) {
 				$items = $response->response->docs;
-			}
+			}			
 		} catch (Exception $e) {
 			JLog::add($e->getMessage(), JLog::ERROR);
 		}
