@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension version="3.1" type="plugin" group="jhandlenet" method="upgrade">
+    <name>plg_jhandlenet_dspace</name>
+    <creationDate>2013-10-25</creationDate>
+	<author>KnowledgeARC</author>
+	<authorEmail>development@knowledgearc.com</authorEmail>
+	<authorUrl>http://www.knowledgearc.com</authorUrl>
+	<copyright>>Copyright (C) 2013 KnowledgeARC Ltd. All rights reserved.</copyright>
+	<license>http://www.gnu.org/licenses/gpl-3.0.html</license>
+    <version>1.0.0</version>
+    <description>PLG_JHANDLENET_DSPACE_XML_DESCRIPTION</description>
+    <files>
+        <filename plugin="dspace">dspace.php</filename>
+    </files>
+    <languages>
+        <language tag="en-GB">language/en-GB/en-GB.plg_jhandlenet_dspace.ini</language>
+        <language tag="en-GB">language/en-GB/en-GB.plg_jhandlenet_dspace.sys.ini</language>
+    </languages>
+    <config>
+        <fields name="params">
+            <fieldset name="basic">
+                <!-- custom settings go here -->
+            </fieldset>
+        </fields>
+    </config>
+</extension>

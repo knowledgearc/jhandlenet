@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="JHandleNet" default="" basedir=".">
+	<target name="clean" description="Clean JHandleNet component from Joomla.">
+		<delete dir="${dest.administrator.components}/com_jhandlenet"/>
+		
+		<delete>
+			<fileset dir="${dest.administrator.languages}" defaultexcludes="true">
+				<include name="**/*.com_jhandlenet*.ini"/>
+			</fileset>
+		</delete>
+		
+		<delete dir="${dest.media}/com_jhandlenet"/>
+		
+		<delete dir="${dest.components}/com_jhandlenet"/>
+		
+		<!--delete>
+			<fileset dir="${dest.languages}" defaultexcludes="true">
+				<include name="**/*.com_jhandlenet*.ini"/>
+			</fileset>
+		</delete-->
+	</target>
+	
+	<target name="update" description="Copies JHandleNet component to existing Joomla install.">
+		<echo message="Deploying JHandleNet component to Joomla! environment."/>
+		
+		<antcall target="clean"/>
+		
+		<copy todir="${dest.administrator.components}/com_jhandlenet">
+			<fileset dir="${src}/admin" defaultexcludes="true">
+				<include name="**"/>
+				<exclude name="**/language/**"/>
+			</fileset>
+		</copy> 
+		
+		<copy todir="${dest.administrator.languages}">
+			<fileset dir="${src}/admin/language" defaultexcludes="true">
+				<include name="**/**"/>
+			</fileset>
+		</copy>
+		
+		<!--copy todir="${dest.media}/com_jhandlenet/js">
+			<fileset dir="${src}/js" defaultexcludes="true">
+				<include name="**/**"/>
+			</fileset>
+		</copy-->
+		
+		<!--copy todir="${dest.media}/com_jhandlenet/css">
+			<fileset dir="${src}/css" defaultexcludes="true">
+				<include name="**/**"/>
+			</fileset>
+		</copy-->
+		
+		<copy todir="${dest.components}/com_jhandlenet">
+			<fileset dir="${src}/site" defaultexcludes="true">
+				<include name="**"/>
+				<exclude name="**/language/**"/>
+			</fileset>
+		</copy>
+
+		<copy todir="${dest.cli}">
+			<fileset dir="${src}/admin/cli" defaultexcludes="true">
+				<include name="jhandlenet.php"/>
+			</fileset>
+		</copy>
+		
+		<!--copy todir="${dest.languages}">
+			<fileset dir="${src}/site/language" defaultexcludes="true">
+				<include name="**/**"/>
+			</fileset>
+		</copy-->
+	</target>
+	
+	<target name="package" description="Creates a JHandleNet component package.">
+		<echo message="Packaging JHandleNet component."/>
+		<zip destfile="${package.dest}/com_jhandlenet.zip"
+		       basedir="${src}"
+		       update="true"
+		       excludes="build*.xml"/>
+	</target>
+</project>
