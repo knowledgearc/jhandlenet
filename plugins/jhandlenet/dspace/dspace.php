@@ -164,16 +164,16 @@ class PlgJHandleNetDSpace extends JPlugin
 		
 		$filters = array();
 		
-		$items = $this->getItem();
+		$items = $this->getItems();
 		
 		// @todo Need a better search algorithm?
 		foreach ($db->loadObjectList() as $row) {
 			$found = false;
-			$handle = $na->na.'/'.$item->handle;			
+			$handle = $row->handle;			
 			
 			reset($items);
 			
-			while ($item = current($items) && !$found) {
+			while (($item = current($items)) && !$found) {
 				$found = ($handle == $item->handle);					
 				next($items);
 			}
