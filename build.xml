@@ -1,66 +1,405 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="JHandleNet" default="update" basedir=".">
-	<property	file="build.properties"/>
-	<property	name="dest.administrator"				value="${dest}/administrator"/>
-	<property	name="dest.administrator.components"	value="${dest.administrator}/components"/>
-	<property	name="dest.administrator.languages"		value="${dest.administrator}/language"/>
-	<property	name="dest.components"					value="${dest}/components"/>
-	<property	name="dest.languages"					value="${dest}/language"/>
-	<property 	name="dest.media" 						value="${dest}/media"/>
-	<property	name="dest.plugins"						value="${dest}/plugins"/>
-	<property	name="dest.modules"						value="${dest}/modules"/>
-	<property	name="dest.libs"						value="${dest}/libraries"/>
-	<property	name="dest.cli"							value="${dest}/cli"/>
-	
-	<target name="update" description="Updates all JHandleNet extensions in an existing Joomla install.">
-		<echo message="Updating all extensions in the Joomla! environment."/>
-		
-		<subant target="update">
-			<fileset dir=".">
-				<include name="**/**/build_*.xml"/>
-			</fileset>
-			<property	name="src"								value="${src}"/>
-			<property	name="dest"								value="${dest}"/>
-			<property	name="dest.administrator.components"	value="${dest.administrator.components}"/>
-        	<property	name="dest.administrator.languages"		value="${dest.administrator.languages}"/>
-			<property	name="dest.components"					value="${dest.components}"/>
-        	<property	name="dest.languages"					value="${dest.languages}"/>
-			<property 	name="dest.media" 						value="${dest.media}"/>
-			<property 	name="dest.plugins" 					value="${dest.plugins}"/>
-			<property 	name="dest.modules" 					value="${dest.modules}"/>
-			<property 	name="dest.libs" 						value="${dest.libs}"/>
-			<property 	name="dest.cli" 						value="${dest.cli}"/>
-        </subant>
-	</target>
-	
-	<target name="updateModuleOnly" description="Updates module in an existing Joomla install.">
-		<echo message="Updating module in the Joomla! environment."/>
-		
-		<subant target="updateModuleOnly">
-			<fileset dir=".">
-				<include name="**/**/build_*.xml"/>
-			</fileset>
-			<property	name="src"								value="${src}"/>
-			<property	name="dest"								value="${dest}"/>
-			<property 	name="dest.modules" 					value="${dest.modules}"/>
-        </subant>
-	</target>
-	
-	<target name="package" description="Packages all JHandleNet extensions for easy installation into Joomla!.">
-		<echo message="Packaging all extensions."/>
-		
-		<mkdir dir="${package.dest}/jhandlenet"/>
-		
-		<subant target="package">
-			<fileset dir=".">
-				<include name="**/**/build_*.xml"/>
-			</fileset>
-			<property	name="src"			value="${src}"/>
-			<property	name="package.dest"	value="${package.dest}/jhandlenet"/>
-        </subant>
-	</target>
-	
-	<target name="help" description="Help documentation for this build file.">
-		<echo message="Help documentation."/>
-	</target>
+<project name="JHandleNet" default="help" basedir=".">
+    <property   file="build.properties"/>
+    <property   name="path.administrator"            value="${path.joomla}/administrator"/>
+    <property   name="path.administrator.components" value="${path.administrator}/components"/>
+    <property   name="path.administrator.languages"  value="${path.administrator}/language"/>
+    <property   name="path.components"               value="${path.joomla}/components"/>
+    <property   name="path.languages"                value="${path.joomla}/language"/>
+    <property   name="path.media"                    value="${path.joomla}/media"/>
+    <property   name="path.plugins"                  value="${path.joomla}/plugins"/>
+    <property   name="path.modules"                  value="${path.joomla}/modules"/>
+    <property   name="path.libs"                     value="${path.joomla}/libraries"/>
+    <property   name="path.cli"                      value="${path.joomla}/cli"/>
+    <property   name="package.dest"                  value="${src}/build"/>
+    <property   name="extensions"                    value="components,libraries,modules,plugins"/>
+
+    <target name="deploy" description="Updates existing extensions in a Joomla! site.">
+        <foreach list="${extensions}" param="extension" target="deploy_extensions"/>
+    </target>
+
+    <target name="deploy_extensions" hidden="true">
+        <if>
+            <available file="${extension}" type="dir"/>
+            <then>
+                <foreach param="directory" absparam="path" target="deploy_extension">
+                    <fileset dir="${extension}">
+                        <type type="dir"/>
+                        <depth max="0" min="0"/>
+                    </fileset>
+                </foreach>
+            </then>
+        </if>
+    </target>
+
+    <target name="deploy_extension" hidden="true">
+        <switch value="${path}">
+            <case value="components/${directory}">
+                <phingcall target="deploy_component"/>
+            </case>
+
+            <case value="libraries/${directory}">
+                <phingcall target="deploy_library"/>
+            </case>
+
+            <case value="modules/${directory}">
+                <phingcall target="deploy_module"/>
+            </case>
+
+            <case value="plugins/${directory}">
+                <phingcall target="deploy_plugins"/>
+            </case>
+
+            <!-- windows \ variations -->
+            <case value="components\${directory}">
+                <phingcall target="deploy_component"/>
+            </case>
+
+            <case value="libraries\${directory}">
+                <phingcall target="deploy_library"/>
+            </case>
+
+            <case value="modules\${directory}">
+                <phingcall target="deploy_module"/>
+            </case>
+
+            <case value="plugins\${directory}">
+                <phingcall target="deploy_plugins"/>
+            </case>
+
+            <default/>
+        </switch>
+    </target>
+
+    <target name="deploy_component" hidden="true">
+        <if>
+            <available file="${path.components}/${directory}" type="dir"/>
+            <then>
+                <delete includeemptydirs="false">
+                    <fileset dir="${path.components}/${directory}" includes="**/*"/>
+                    <fileset dir="${path.administrator.components}/${directory}" includes="**/*"/>
+                    <fileset dir="${path.media}/${directory}" includes="**/*"/>
+                </delete>
+
+                <copy todir="${path.components}/${directory}">
+                    <fileset dir="./components/${directory}/site">
+                        <include name="**/**"/>
+                        <exclude name="language/**"/>
+                    </fileset>
+                </copy>
+
+                <copy todir="${path.languages}">
+                    <fileset dir="components/${directory}/site/language">
+                        <include name="**/**"/>
+                    </fileset>
+                </copy>
+
+                <copy todir="${path.administrator.components}/${directory}">
+                    <fileset dir="components/${directory}/admin">
+                        <exclude name="cli/**"/>
+                        <exclude name="language/**"/>
+                        <include name="**/**"/>
+                    </fileset>
+                    <fileset dir="components/${directory}">
+                        <include name="*.xml"/>
+                    </fileset>
+                </copy>
+
+                <copy todir="${path.administrator.languages}">
+                    <fileset dir="components/${directory}/admin/language">
+                        <include name="**/**"/>
+                    </fileset>
+                </copy>
+
+                <if>
+                    <available file='components/${directory}/admin/cli' type='dir'/>
+                    <then>
+                        <copy todir="${path.cli}">
+                            <fileset dir="./components/${directory}/admin/cli">
+                                <include name="*"/>
+                            </fileset>
+                        </copy>
+                    </then>
+                </if>
+
+                <if>
+                    <available file='${src}/components/${directory}/media' type='dir'/>
+                    <then>
+                        <mkdir dir="${path.media}/${directory}"/>
+                        <copy todir="${path.media}/${directory}">
+                            <fileset dir="./components/${directory}/media/">
+                                <include name="**/**"/>
+                            </fileset>
+                        </copy>
+                    </then>
+                </if>
+            </then>
+        </if>
+    </target>
+
+    <target name="deploy_library" hidden="true">
+        <if>
+            <available file="${path.libs}/${directory}" type="dir"/>
+            <then>
+                <delete includeemptydirs="false">
+                    <fileset dir="${path.libs}/${directory}" includes="**/*"/>
+                </delete>
+
+                <copy todir="${path.libs}/${directory}">
+                    <fileset dir="./libraries/${directory}">
+                        <include name="**/**"/>
+                        <exclude name="language/**"/>
+                    </fileset>
+                </copy>
+
+                <copy todir="${path.languages}">
+                    <fileset dir="./libraries/${directory}/language">
+                        <include name="**/**"/>
+                    </fileset>
+                </copy>
+
+                <copy todir="${path.administrator.languages}">
+                    <fileset dir="./libraries/${directory}/language">
+                        <include name="**/**"/>
+                    </fileset>
+                </copy>
+
+                <copy todir="${path.administrator}/manifests">
+                    <fileset dir="libraries/${directory}">
+                        <include name="*.xml"/>
+                    </fileset>
+                </copy>
+            </then>
+        </if>
+    </target>
+
+    <target name="deploy_module" hidden="true">
+        <if>
+            <available file="${path.modules}/${directory}" type="dir"/>
+            <then>
+                <delete includeemptydirs="false">
+                    <fileset dir="${path.modules}/${directory}" includes="**/*"/>
+                </delete>
+
+                <copy todir="${path.modules}/${directory}">
+                    <fileset dir="./modules/${directory}">
+                        <include name="**/**"/>
+                        <exclude name="language/**"/>
+                    </fileset>
+                </copy>
+
+                <copy todir="${path.languages}">
+                    <fileset dir="./modules/${directory}/language">
+                        <include name="**/**"/>
+                    </fileset>
+                </copy>
+            </then>
+        </if>
+    </target>
+
+    <target name="deploy_plugins" hidden="true">
+        <if>
+            <available file="${extension}" type="dir"/>
+            <then>
+                <foreach param="subdirectory" absparam="plugin_path" target="deploy_plugin">
+                    <fileset dir="plugins/${directory}">
+                        <type type="dir"/>
+                        <depth max="0" min="0"/>
+                    </fileset>
+                </foreach>
+            </then>
+        </if>
+    </target>
+
+    <target name="deploy_plugin" hidden="true">
+        <if>
+            <available file="${path.plugins}/${directory}/${subdirectory}" type="dir"/>
+            <then>
+                <delete includeemptydirs="false">
+                    <fileset dir="${path.plugins}/${directory}/${subdirectory}" includes="**/*"/>
+                </delete>
+
+                <copy todir="${path.plugins}/${directory}/${subdirectory}">
+                    <fileset dir="${src}/plugins/${directory}/${subdirectory}">
+                        <include name="**/**"/>
+                        <exclude name="language/**"/>
+                    </fileset>
+                </copy>
+
+                <copy todir="${path.administrator.languages}">
+                    <fileset dir="${src}/plugins/${directory}/${subdirectory}/language">
+                        <include name="**/**"/>
+                    </fileset>
+                </copy>
+            </then>
+        </if>
+    </target>
+
+    <target name="test" description="Runs all unit tests." depends="deploy, deploy_test_data">
+        <phpunit bootstrap="tests/unit/bootstrap.php">
+            <formatter type="plain" usefile="false"/>
+            <batchtest>
+                <fileset dir="tests/unit/suites/libraries/JSpace/Metadata">
+                    <include name="*Test.php"/>
+                </fileset>
+                <fileset dir="tests/unit/suites/plugins/${id}">
+                    <include name="harvest/*Test.php"/>
+                    <include name="localstore/*Test.php"/>
+                    <include name="weblinks/*Test.php"/>
+                    <!-- it would be good to run the individual harvesting tests but something is causing the oai tests to fail. Most probably caused by both plugins being loaded. Would be good to have better control over loading and testing plugins. -->
+                    <exclude name="oai/*Test.php"/>
+                    <exclude name="opensearch/*Test.php"/>
+                </fileset>
+            </batchtest>
+        </phpunit>
+    </target>
+
+    <target name="deploy_test_data">
+        <delete includeemptydirs="false">
+            <fileset dir="${path.joomla}/../${id}" includes="**/*"/>
+        </delete>
+
+        <copy todir="${path.joomla}/../${id}">
+            <fileset dir="tests/unit/stubs">
+                <include name="**/**"/>
+            </fileset>
+        </copy>
+
+        <move
+            file="${path.joomla}/../${id}/opensearch/htaccess.txt"
+            tofile="${path.joomla}/../${id}/opensearch/.htaccess"/>
+    </target>
+
+    <target name="cpd" description="Check for copying and pasting.">
+        <phpcpd minTokens="50">
+            <fileset dir="${src}">
+                <include name="**/*.php"/>
+                <exclude name="tests/**"/>
+            </fileset>
+        </phpcpd>
+    </target>
+
+    <target name="package" description="Packages extensions ready for installation into Joomla!.">
+        <mkdir dir="${package.dest}"/>
+
+        <foreach list="${extensions}" param="extension" target="package_extensions"/>
+
+        <move todir="${package.dest}/packages">
+            <fileset dir="${package.dest}" includes="${package.extensions}"/>
+        </move>
+
+        <zip destfile="${package.dest}/pkg_${id}.zip">
+            <fileset dir="${package.dest}">
+                <include name="packages/**"/>
+            </fileset>
+
+            <fileset dir=".">
+                <include name="pkg_jcar.xml"/>
+            </fileset>
+        </zip>
+
+        <delete dir="${package.dest}/packages"/>
+    </target>
+
+    <target name="package_extensions" hidden="true">
+        <if>
+            <available file="${extension}" type="dir"/>
+            <then>
+                <foreach param="directory" absparam="path" target="package_extension">
+                    <fileset dir="${extension}">
+                        <type type="dir"/>
+                        <depth max="0" min="0"/>
+                    </fileset>
+                </foreach>
+            </then>
+        </if>
+    </target>
+
+    <target name="package_extension" hidden="true">
+        <switch value="${path}">
+            <case value="plugins/${directory}">
+                <foreach param="subdirectory" absparam="plugin_path" target="package_plugin">
+                    <fileset dir="plugins/${directory}">
+                        <type type="dir"/>
+                        <depth max="0" min="0"/>
+                    </fileset>
+                </foreach>
+            </case>
+
+            <default>
+                <zip
+                    destfile="${package.dest}/${directory}.zip"
+                    basedir="${src}/${extension}/${directory}"/>
+            </default>
+        </switch>
+    </target>
+
+    <target name="package_plugin" hidden="true">
+        <php function="str_replace" returnProperty="replaced">
+            <param value="plugins"/>
+            <param value="plg"/>
+            <param value="${plugin_path}"/>
+        </php>
+        <php function="str_replace" returnProperty="replaced">
+            <param value="/"/>
+            <param value="_"/>
+            <param value="${replaced}"/>
+        </php>
+
+        <zip
+            destfile="${package.dest}/${replaced}.zip"
+            basedir="${src}/${plugin_path}"/>
+    </target>
+
+    <target name="setup_properties" hidden="true">
+        <tstamp>
+            <format property="build.date" pattern="%Y-%m-%d" />
+        </tstamp>
+
+        <!-- @TODO automate version. -->
+    </target>
+
+    <target name="help" description="Help documentation for this build file.">
+        <echo message="JHandleNet for Joomla!"/>
+        <echo message="Targets:"/>
+
+        <echo message="cpd          Check for copy/paste code duplication."/>
+
+        <echo message=""/>
+
+        <echo message="deploy       Copy extension code to an existing Joomla"/>
+        <echo message="             installation as defined by the dest"/>
+        <echo message="             parameter in your build.properties file."/>
+
+        <echo message=""/>
+
+        <echo message="package      Packages all extensions for installation"/>
+        <echo message="             via the Joomla Extension Manager."/>
+
+        <echo message=""/>
+
+        <echo message="test         Run the unit tests."/>
+
+        <echo message=""/>
+
+        <echo message="Additional Flags:"/>
+
+        <echo message=""/>
+
+        <echo message="extensions   Specify one or more extension types to"/>
+        <echo message="             target when calling deploy or package."/>
+        <echo message="             Available options are:"/>
+        <echo message="             - components"/>
+        <echo message="             - libraries"/>
+        <echo message="             - modules"/>
+        <echo message="             - plugins"/>
+
+
+        <echo message="Examples:"/>
+
+        <echo message=""/>
+
+        <echo message="phing deploy -Dextensions=plugins"/>
+        <echo message="phing package -Dextensions=components"/>
+    </target>
 </project>

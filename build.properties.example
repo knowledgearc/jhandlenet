@@ -1,3 +1,4 @@
+id=jhandlenet
 src=.
-dest=/path/to/your/joomla/installation
-package.dest=/where/create/packages
+path.joomla=/var/www/html/
+package.extensions=

@@ -1,8 +1,9 @@
 #!/usr/bin/php
 <?php
 /**
- * @package JHandleNet
- * @copyright Copyright (C) 2013 KnowledgeARC Ltd. All rights reserved.
+ * @package    JHandleNet
+ * @copyright  Copyright (C) 2013-2017 KnowledgeArc Ltd. All rights reserved.
+ * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 // Make sure we're being called from the command line, not a web interface
@@ -19,19 +20,19 @@ define('_JEXEC', 1);
 
 // Load system defines
 if (file_exists(dirname(dirname(__FILE__)) . '/defines.php')) {
-        require_once dirname(dirname(__FILE__)) . '/defines.php';
+    require_once dirname(dirname(__FILE__)) . '/defines.php';
 }
 
 if (!defined('_JDEFINES')) {
-	define('JPATH_BASE', dirname(dirname(__FILE__)));
-	require_once JPATH_BASE . '/includes/defines.php';
+    define('JPATH_BASE', dirname(dirname(__FILE__)));
+    require_once JPATH_BASE . '/includes/defines.php';
 }
 
 // Get the framework.
 if (file_exists(JPATH_LIBRARIES . '/import.legacy.php'))
-	require_once JPATH_LIBRARIES . '/import.legacy.php';	
+    require_once JPATH_LIBRARIES . '/import.legacy.php';
 else
-	require_once JPATH_LIBRARIES . '/import.php';
+    require_once JPATH_LIBRARIES . '/import.php';
 
 // Bootstrap the CMS libraries.
 require_once JPATH_LIBRARIES . '/cms.php';
@@ -41,15 +42,15 @@ require_once JPATH_CONFIGURATION . '/configuration.php';
 
 
 if (version_compare(JVERSION, "3.0", "l")) {
-	// Force library to be in JError legacy mode
-	JError::$legacy = true;
-	
-	// Import necessary classes not handled by the autoloaders
-	jimport('joomla.application.menu');
-	jimport('joomla.environment.uri');
-	jimport('joomla.event.dispatcher');
-	jimport('joomla.utilities.utility');
-	jimport('joomla.utilities.arrayhelper');	
+    // Force library to be in JError legacy mode
+    JError::$legacy = true;
+
+    // Import necessary classes not handled by the autoloaders
+    jimport('joomla.application.menu');
+    jimport('joomla.environment.uri');
+    jimport('joomla.event.dispatcher');
+    jimport('joomla.utilities.utility');
+    jimport('joomla.utilities.arrayhelper');
 }
 
 // System configuration.
@@ -69,7 +70,7 @@ $lang->load('jhandlenet_cli', JPATH_SITE, null, false, false)
 
 jimport('joomla.application.component.helper');
 jimport('joomla.log.log');
- 
+
 /**
  * Simple command line interface application class.
  *
@@ -77,222 +78,222 @@ jimport('joomla.log.log');
  */
 class JHandleNet extends JApplicationCli
 {
-	private $db;
-	
-	public function __construct($input = null, JRegistry $config = null, JEventDispatcher $dispatcher = null) 
-	{
-		parent::__construct($input, $config, $dispatcher);
-		
-		
-		$params = JComponentHelper::getParams('com_jhandlenet');
-		
-		$option['driver']   = 'mysqli';
-		$option['host']     = $params->get('host').':'.$params->get('port');
-		$option['user']     = $params->get('username');
-		$option['password'] = $params->get('password');
-		$option['database'] = $params->get('database');
-		$option['prefix']   = '';
-		
-		$db = JDatabaseDriver::getInstance($option);
-		
-		$this->setDbo($db);
-	}
-	
-    public function doExecute()
-    { 	
-    	// fool the system into thinking we are running as JSite with JHandleNet as the active component
-		JFactory::getApplication('site');
-		$_SERVER['HTTP_HOST'] = 'domain.com';
+    private $db;
 
-		// Disable caching.
-		$config = JFactory::getConfig();
-		$config->set('caching', 0);
-		$config->set('cache_handler', 'file');
-		
-		try {
-			// home a prefix
-		    if ($this->input->get('home')) {
-		    	$username = $this->input->get('username', null, 'string');
+    public function __construct($input = null, JRegistry $config = null, JEventDispatcher $dispatcher = null)
+    {
+        parent::__construct($input, $config, $dispatcher);
 
-		    	
-		    	$password = $this->input->get('password', null, 'string');
 
-    			$this->home(
-    				$this->input->get('home', null, 'string'),
-    				JArrayHelper::getValue($this->input->args, 0),
-    				$this->input->get('archive', null, 'string'),
-    				$username,
-    				$password);
-    			return;
-	    	}
-	    	
-	    	// unhome a prefix
-	    	if ($this->input->get('unhome')) {
-	    		$this->unhome($this->input->get('unhome'));
-	    		return;
-	    	}
-	    	
-	    	// rebuild prefix handle index.
-	    	if ($this->input->get('r') || $this->input->get('rebuild')) {
-	    		$na = $this->input->get('r', $this->input->get('rebuild'));
-	    		
-	    		$this->rebuild($na);
-	    		return;
-	    	}
-	    	
-	    	// purge handles for prefix.
-	    	if ($this->input->get('p') || $this->input->get('purge')) {
-	    		$na = $this->input->get('p', $this->input->get('purge'));
-	    		$this->purge($na);
-	    		return;
-	    	}
-	    	
-	    	// update handles for prefix, creating handles for new records.
-	    	if ($this->input->get('u') || $this->input->get('update')) {
-	    		$na = $this->input->get('u', $this->input->get('update'));
-	    		$this->update($na);
-	    		return;
-	    	}
-	    	
-	    	
-	    	// clean handles for prefix, clean handles for records that don't 
-	    	//exist.
-	    	if ($this->input->get('c') || $this->input->get('clean')) {
-	    		$na = $this->input->get('c', $this->input->get('clean'));	    		 
-	    		$this->clean($na);
-	    		return;
-	    	}
-	    	
-	    	// help/catchall
-	    	$this->help();	    	
-		} catch (Exception $e) {
-			$this->out('ERROR: '.$e->getMessage());			
-		}
+        $params = JComponentHelper::getParams('com_jhandlenet');
+
+        $option['driver']   = 'mysqli';
+        $option['host']     = $params->get('host').':'.$params->get('port');
+        $option['user']     = $params->get('username');
+        $option['password'] = $params->get('password');
+        $option['database'] = $params->get('database');
+        $option['prefix']   = '';
+
+        $db = JDatabaseDriver::getInstance($option);
+
+        $this->setDbo($db);
     }
-    
+
+    public function doExecute()
+    {
+        // fool the system into thinking we are running as JSite with JHandleNet as the active component
+        JFactory::getApplication('site');
+        $_SERVER['HTTP_HOST'] = 'domain.com';
+
+        // Disable caching.
+        $config = JFactory::getConfig();
+        $config->set('caching', 0);
+        $config->set('cache_handler', 'file');
+
+        try {
+            // home a prefix
+            if ($this->input->get('home')) {
+                $username = $this->input->get('username', null, 'string');
+
+
+                $password = $this->input->get('password', null, 'string');
+
+                $this->home(
+                    $this->input->get('home', null, 'string'),
+                    JArrayHelper::getValue($this->input->args, 0),
+                    $this->input->get('archive', null, 'string'),
+                    $username,
+                    $password);
+                return;
+            }
+
+            // unhome a prefix
+            if ($this->input->get('unhome')) {
+                $this->unhome($this->input->get('unhome'));
+                return;
+            }
+
+            // rebuild prefix handle index.
+            if ($this->input->get('r') || $this->input->get('rebuild')) {
+                $na = $this->input->get('r', $this->input->get('rebuild'));
+
+                $this->rebuild($na);
+                return;
+            }
+
+            // purge handles for prefix.
+            if ($this->input->get('p') || $this->input->get('purge')) {
+                $na = $this->input->get('p', $this->input->get('purge'));
+                $this->purge($na);
+                return;
+            }
+
+            // update handles for prefix, creating handles for new records.
+            if ($this->input->get('u') || $this->input->get('update')) {
+                $na = $this->input->get('u', $this->input->get('update'));
+                $this->update($na);
+                return;
+            }
+
+
+            // clean handles for prefix, clean handles for records that don't
+            //exist.
+            if ($this->input->get('c') || $this->input->get('clean')) {
+                $na = $this->input->get('c', $this->input->get('clean'));
+                $this->clean($na);
+                return;
+            }
+
+            // help/catchall
+            $this->help();
+        } catch (Exception $e) {
+            $this->out('ERROR: '.$e->getMessage());
+        }
+    }
+
     public function out($text = '', $nl = true)
     {
-    	if (!($this->input->get('q', false) || $this->input->get('quiet', false))) {
-    		parent::out($text, $nl);
-    	}
-    	
-    	return $this;
+        if (!($this->input->get('q', false) || $this->input->get('quiet', false))) {
+            parent::out($text, $nl);
+        }
+
+        return $this;
     }
-    
+
     public function home($na, $url, $endpoint = null, $username = null, $password = null)
     {
-    	if (!$na) {
-    		$this->out('No naming authority specified.');
-    		return;
-    	}
-    	 
-    	if (!$url) {
-    		$this->out('No url specified');
-    		return;
-    	}
-    
-    	$table = $this->getTable();
-    
-    	if ($table->load($na)) {
-    		$this->out(JText::sprintf('Cannot home handle prefix %s. Already exists.', $na));
-    	} else {
-    		$table->na = $na;
-    		$table->url = $url;
-    		$table->archive_endpoint = $endpoint;
-    		$table->archive_username = $username;
-    		$table->archive_password = $password;
-    
-    		if ($table->store()) {
-    			if ($this->input->get('v') || $this->input->get('verbose')) {
-    				$this->out(JText::sprintf('Handle prefix %s homed.', $na));
-    			}
-    		}
-    	}
+        if (!$na) {
+            $this->out('No naming authority specified.');
+            return;
+        }
+
+        if (!$url) {
+            $this->out('No url specified');
+            return;
+        }
+
+        $table = $this->getTable();
+
+        if ($table->load($na)) {
+            $this->out(JText::sprintf('Cannot home handle prefix %s. Already exists.', $na));
+        } else {
+            $table->na = $na;
+            $table->url = $url;
+            $table->archive_endpoint = $endpoint;
+            $table->archive_username = $username;
+            $table->archive_password = $password;
+
+            if ($table->store()) {
+                if ($this->input->get('v') || $this->input->get('verbose')) {
+                    $this->out(JText::sprintf('Handle prefix %s homed.', $na));
+                }
+            }
+        }
     }
-    
+
     public function unhome($na)
     {
-    	if (!$na) {
-    		$this->out('No naming authority specified.');
-    		return;
-    	}
+        if (!$na) {
+            $this->out('No naming authority specified.');
+            return;
+        }
 
-		$table = $this->getTable();
-    	
-    	if ($table->load($na)) {    		
-    		if ($table->delete()) {
-    			if ($this->input->get('v') || $this->input->get('verbose')) {
-    				$this->out(JText::sprintf('Handle prefix %s unhomed.', $na));
-    			}
-    		}
-    	} else {
-    		$this->out(JText::sprintf("Cannot unhome handle prefix %s. Prefix doesn't exists.", $na));
-    	}
+        $table = $this->getTable();
+
+        if ($table->load($na)) {
+            if ($table->delete()) {
+                if ($this->input->get('v') || $this->input->get('verbose')) {
+                    $this->out(JText::sprintf('Handle prefix %s unhomed.', $na));
+                }
+            }
+        } else {
+            $this->out(JText::sprintf("Cannot unhome handle prefix %s. Prefix doesn't exists.", $na));
+        }
     }
-    
+
     public function rebuild($na)
     {
-    	if (!$na) {
-    		$this->out('Cannot rebuild handles using an empty prefix.');
-    		return;
-    	}
-    	
-    	$this->purge($na);
+        if (!$na) {
+            $this->out('Cannot rebuild handles using an empty prefix.');
+            return;
+        }
 
-    	try {
-    		$this->_fireEvent('onHandlesCreate', array($na));
-    	} catch (Exception $e) {    		
-    		$this->out($e->getMessage());
-    	}
+        $this->purge($na);
+
+        try {
+            $this->fireEvent('onHandlesCreate', array($na));
+        } catch (Exception $e) {
+            $this->out($e->getMessage());
+        }
     }
-    
+
     public function update($na)
     {
-    	if (!$na) {
-    		$this->out('Cannot update handles using an empty prefix.');
-    		return;
-    	}
+        if (!$na) {
+            $this->out('Cannot update handles using an empty prefix.');
+            return;
+        }
 
-    	try {
-    		$this->_fireEvent('onHandlesUpdate', array($na));
-    	} catch (Exception $e) {
-    		$this->out($e->getMessage());
-    	}
+        try {
+            $this->fireEvent('onHandlesUpdate', array($na));
+        } catch (Exception $e) {
+            $this->out($e->getMessage());
+        }
     }
-    
+
     public function clean($na)
     {
-    	if (!$na) {
-    		$this->out('Cannot update clean using an empty prefix.');
-    		return;
-    	}
+        if (!$na) {
+            $this->out('Cannot update clean using an empty prefix.');
+            return;
+        }
 
-    	try {
-    		$this->_fireEvent('onHandlesClean', array($na));
-    	} catch (Exception $e) {
-    		$this->out($e->getMessage());
-    	}
-    }    
-    
+        try {
+            $this->fireEvent('onHandlesClean', array($na));
+        } catch (Exception $e) {
+            $this->out($e->getMessage());
+        }
+    }
+
     public function purge($na)
     {
-    	if (!$na) {
-    		$this->out('No prefix to purge.');
-    		return;
-    	}
-    	
-    	$db = $this->getDbo();
-    	
-    	$query = $db->getQuery(true);
-    	
-    	$query
-    		->delete('handles')
-    		->where('na='.$na);
-    	
-    	$db->setQuery($query);
-    	$db->execute();
+        if (!$na) {
+            $this->out('No prefix to purge.');
+            return;
+        }
+
+        $db = $this->getDbo();
+
+        $query = $db->getQuery(true);
+
+        $query
+            ->delete('handles')
+            ->where('na='.$na);
+
+        $db->setQuery($query);
+        $db->execute();
     }
-    
+
     public function help()
     {
 echo <<<EOT
@@ -300,8 +301,8 @@ Usage: jhandlenet [options] arg na
    jhandlenet [options] --home na [param]=[value] url
 
 Manage handles within a universal handle.net database.
-When homing a naming authority use the Homing parameters to specify additional 
-homing-specific settings. 
+When homing a naming authority use the Homing parameters to specify additional
+homing-specific settings.
 
   -c, --clean         Clean out orphaned handles from the handle.net database.
   -h, --help          Display this help and exit.
@@ -319,31 +320,31 @@ Homing:
 
 EOT;
     }
-    
+
     public function setDbo($db)
     {
-    	$this->db = $db;
+        $this->db = $db;
     }
-    
+
     public function getDbo()
     {
-    	return $this->db;
+        return $this->db;
     }
-    
-    private function _fireEvent($name, $args = array())
-    {
-    	$dispatcher = JDispatcher::getInstance();
-    	 
-    	JPluginHelper::importPlugin("jhandlenet", null, true, $dispatcher);
 
-    	return $dispatcher->trigger($name, $args);
+    private function fireEvent($name, $args = array())
+    {
+        $dispatcher = JDispatcher::getInstance();
+
+        JPluginHelper::importPlugin("jhandlenet", null, true, $dispatcher);
+
+        return $dispatcher->trigger($name, $args);
     }
-    
+
     public function getTable()
     {
-    	JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_jhandlenet/tables');
-    	return JTable::getInstance('NA', 'JHandleNetTable', array('dbo'=>$this->getDbo()));
+        JTable::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_jhandlenet/tables');
+        return JTable::getInstance('NA', 'JHandleNetTable', array('dbo'=>$this->getDbo()));
     }
 }
- 
+
 JApplicationCli::getInstance('JHandleNet')->execute();

@@ -2,8 +2,8 @@
 /**
  * A script for intercepting calls to this component and handling them appropriately.
  * 
- * @copyright	Copyright (C) 2013 KnowledgeARC Ltd. All rights reserved.
- * @license     This file is part of the JHandleNet component for Joomla!.
+ * @copyright    Copyright (C) 2013-2017 KnowledgeArc Ltd. All rights reserved.
+ * @license      This file is part of the JHandleNet component for Joomla!.
 
    The JHandleNet component for Joomla! is free software: you can redistribute it 
    and/or modify it under the terms of the GNU General Public License as 
@@ -32,7 +32,7 @@ $input = JFactory::getApplication()->input;
 
 if (!JFactory::getUser()->authorise('core.manage', 'com_jhandlenet'))
 {
-	return JError::raiseWarning(404, JText::_('JERROR_ALERTNOAUTHOR'));
+    return JError::raiseWarning(404, JText::_('JERROR_ALERTNOAUTHOR'));
 }
 
 $task = $input->get('task');
