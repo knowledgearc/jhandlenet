@@ -12,7 +12,7 @@ class JHandleNetTableNA extends JTable
 {
     public function __construct(&$db)
     {
-        parent::__construct('nas', 'na', $db);
+        parent::__construct('#__jhandlenet_nas', 'na', $db);
     }
 
     public function store($updateNulls = false)

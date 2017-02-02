@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension type="component" version="3.1" method="upgrade">
     <name>com_jhandlenet</name>
-    <creationDate>2013-10-10</creationDate>
-    <author>KnowledgeARC</author>
+    <creationDate>2017-02-02</creationDate>
+    <author>KnowledgeArc</author>
     <authorEmail>development@knowledgearc.com</authorEmail>
     <authorUrl>http://www.knowledgearc.com</authorUrl>
     <copyright>Copyright (C) 2013-2017 KnowledgeArc Ltd. All rights reserved.</copyright>
     <license>http://www.gnu.org/licenses/gpl-3.0.html</license>
-    <version>1.0.0</version>
+    <version>1.1.0-alpha</version>
     <description>COM_JHANDLENET_XML_DESCRIPTION</description>
 
     <scriptfile>script.php</scriptfile>
@@ -41,11 +41,14 @@
     </languages>
 
     <administration>
+        <menu img="class:jhandlenet">com_jhandlenet</menu>
+
         <files folder="admin">
             <folder>cli</folder>
             <folder>controllers</folder>
             <folder>helpers</folder>
             <folder>models</folder>
+            <folder>sql</folder>
             <folder>tables</folder>
             <folder>views</folder>
             <filename>access.xml</filename>

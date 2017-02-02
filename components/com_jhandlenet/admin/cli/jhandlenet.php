@@ -83,20 +83,6 @@ class JHandleNet extends JApplicationCli
     public function __construct($input = null, JRegistry $config = null, JEventDispatcher $dispatcher = null)
     {
         parent::__construct($input, $config, $dispatcher);
-
-
-        $params = JComponentHelper::getParams('com_jhandlenet');
-
-        $option['driver']   = 'mysqli';
-        $option['host']     = $params->get('host').':'.$params->get('port');
-        $option['user']     = $params->get('username');
-        $option['password'] = $params->get('password');
-        $option['database'] = $params->get('database');
-        $option['prefix']   = '';
-
-        $db = JDatabaseDriver::getInstance($option);
-
-        $this->setDbo($db);
     }
 
     public function doExecute()

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<extension type="package" version="3.5" method="upgrade">
+    <name>JHandleNet Package</name>
+    <author>KnowledgeArc Ltd</author>
+    <creationDate>2017-02-02</creationDate>
+    <packagename>jhandlenet</packagename>
+    <version>1.1.0-alpha</version>
+    <copyright>>Copyright (C) 2013-2017 KnowledgeArc Ltd. All rights reserved.</copyright>
+    <license>http://www.gnu.org/licenses/gpl-3.0.html</license>
+    <packager>KnowledgeArc Ltd</packager>
+    <packagerurl>http://www.knowledgearc.org</packagerurl>
+    <description>Joomla! Handle.net management.</description>
+
+    <files folder="packages">
+        <file type="component" id="com_jhandlenet" >com_jhandlenet.zip</file>
+        <file type="plugin" id="jhandlenet" group="content">plg_jhandlenet_dspace.zip</file>
+    </files>
+
+    <updateservers>
+        <server type="extension" priority="1" name="JCar">https://raw.githubusercontent.com/knowledgearcdotorg/jhandlenet/master/manifest.xml</server>
+    </updateservers>
+</extension>

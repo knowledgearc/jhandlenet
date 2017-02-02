@@ -88,11 +88,16 @@
                     </fileset>
                 </copy>
 
-                <copy todir="${path.languages}">
-                    <fileset dir="components/${directory}/site/language">
-                        <include name="**/**"/>
-                    </fileset>
-                </copy>
+                <if>
+                    <available file="components/${directory}/site/language" type="dir"/>
+                    <then>
+                        <copy todir="${path.languages}">
+                            <fileset dir="components/${directory}/site/language">
+                                <include name="**/**"/>
+                            </fileset>
+                        </copy>
+                    </then>
+                </if>
 
                 <copy todir="${path.administrator.components}/${directory}">
                     <fileset dir="components/${directory}/admin">
@@ -280,7 +285,7 @@
     </target>
 
     <target name="package" description="Packages extensions ready for installation into Joomla!.">
-        <mkdir dir="${package.dest}"/>
+        <mkdir dir="${package.dest}/packages"/>
 
         <foreach list="${extensions}" param="extension" target="package_extensions"/>
 
@@ -294,7 +299,7 @@
             </fileset>
 
             <fileset dir=".">
-                <include name="pkg_jcar.xml"/>
+                <include name="pkg_${id}.xml"/>
             </fileset>
         </zip>
 

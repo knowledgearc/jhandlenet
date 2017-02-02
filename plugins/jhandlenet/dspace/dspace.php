@@ -97,7 +97,7 @@ class PlgJHandleNetDSpace extends JPlugin
         $query = $db->getQuery(true);
         $query
             ->select('MAX(data)')
-            ->from('handles');
+            ->from('#__jhandlenet_handles');
 
         $db->setQuery($query);
 
@@ -131,7 +131,7 @@ class PlgJHandleNetDSpace extends JPlugin
         $query = $db->getQuery(true);
         $query
         ->select('na, handle')
-        ->from('handles')
+        ->from('#__jhandlenet_handles')
         ->order('handle asc');
 
         $db->setQuery($query);
@@ -155,7 +155,7 @@ class PlgJHandleNetDSpace extends JPlugin
             if (!$found) {
                 $query = $db->getQuery(true);
                 $query
-                ->delete('handles')
+                ->delete('#__jhandlenet_handles')
                 ->where("handle = '".$handle."'");
             }
         }
@@ -243,7 +243,7 @@ class PlgJHandleNetDSpace extends JPlugin
             if (count($array) == count($items) || count($array) == static::$chunk) {
                 $query = $db->getQuery(true);
                 $query
-                ->insert('handles')
+                ->insert('#__jhandlenet_handles')
                 ->values($array);
 
                 $db->setQuery($query);

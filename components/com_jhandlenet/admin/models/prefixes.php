@@ -28,25 +28,6 @@ class JHandleNetModelPrefixes extends JModelList
         $option = array();
 
         Jlog::addLogger(array('text_file'=>'jhandlenet.php'), JLog::ALL, 'jhandlenet');
-
-        $params = JComponentHelper::getParams('com_jhandlenet');
-
-        $option['driver']   = 'mysqli';
-        $option['host']     = $params->get('host').':'.$params->get('port');
-        $option['user']     = $params->get('username');
-        $option['password'] = $params->get('password');
-        $option['database'] = $params->get('database');
-        $option['prefix']   = '';
-
-        $db = JDatabaseDriver::getInstance($option);
-        parent::setDbo($db);
-
-        // force a connect so we can use $db->connected.
-        try {
-            $db->connect();
-        } catch (Exception $e) {
-            // ignore connection error and continue.
-        }
     }
 
     /**
@@ -74,8 +55,8 @@ class JHandleNetModelPrefixes extends JModelList
         $select = array('a.na', 'a.url', 'COUNT(b.handle) AS count');
         $query
             ->select($select)
-            ->from($db->quoteName('nas') . ' AS a')
-            ->join('left', $db->quoteName('handles') . ' AS b ON a.na = b.na')
+            ->from($db->quoteName('#__jhandlenet_nas') . ' AS a')
+            ->join('left', $db->quoteName('#__jhandlenet_handles') . ' AS b ON a.na = b.na')
             ->group('na');
 
         return $query;

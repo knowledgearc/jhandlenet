@@ -1,4 +1,4 @@
 id=jhandlenet
 src=.
 path.joomla=/var/www/html/
-package.extensions=
+package.extensions=com_jhandlenet.zip

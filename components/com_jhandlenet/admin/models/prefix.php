@@ -32,21 +32,6 @@ class JHandleNetModelPrefix extends JModelAdmin
         $option = array();
 
         Jlog::addLogger(array('text_file'=>'jhandlenet.php'), JLog::ALL, 'jhandlenet');
-
-        $params = JComponentHelper::getParams('com_jhandlenet');
-
-        $option['driver']   = 'mysqli';
-        $option['host']     = $params->get('host').':'.$params->get('port');
-        $option['user']     = $params->get('username');
-        $option['password'] = $params->get('password');
-        $option['database'] = $params->get('database');
-        $option['prefix']   = '';
-
-        $db = JDatabaseDriver::getInstance($option);
-        parent::setDbo($db);
-
-        // force a connect so we can use $db->connected.
-        $db->connect();
     }
 
     /**

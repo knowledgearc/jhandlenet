@@ -32,24 +32,7 @@ class JHandleNetModelHandle extends JModelItem
     {
         parent::__construct($config);
 
-        $option = array();
-
         Jlog::addLogger(array('text_file'=>'jhandlenet.php'), JLog::ALL, 'jhandlenet');
-
-        $params = JComponentHelper::getParams('com_jhandlenet');
-
-        $option['driver']   = 'mysqli';
-        $option['host']     = $params->get('host').':'.$params->get('port');
-        $option['user']     = $params->get('username');
-        $option['password'] = $params->get('password');
-        $option['database'] = $params->get('database');
-        $option['prefix']   = '';
-
-        $db = JDatabaseDriver::getInstance($option);
-        parent::setDbo($db);
-
-        // force a connect so we can use $db->connected.
-        $db->connect();
     }
 
     /**
@@ -80,8 +63,8 @@ class JHandleNetModelHandle extends JModelItem
             $query = $db->getQuery(true);
             $query
                 ->select('a.*, b.url')
-                ->from('handles AS a')
-                ->join('inner', 'nas as b ON (a.na = b.na)')
+                ->from('#__jhandlenet_handles AS a')
+                ->join('inner', '#__jhandlenet_nas as b ON (a.na = b.na)')
                 ->where("handle='".$id."'");
 
             $db->setQuery($query);
