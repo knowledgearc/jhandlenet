@@ -62,7 +62,7 @@ class JHandleNetModelHandle extends JModelItem
 
             $query = $db->getQuery(true);
             $query
-                ->select('a.*, b.url')
+                ->select('a.*')
                 ->from('#__jhandlenet_handles AS a')
                 ->join('inner', '#__jhandlenet_nas as b ON (a.na = b.na)')
                 ->where("handle='".$id."'");
@@ -71,7 +71,6 @@ class JHandleNetModelHandle extends JModelItem
 
             $this->_item = $db->loadObject();
             $this->_item->url = preg_replace('{/$}', '', $this->_item->url);
-            print_r($this->_item);
         }
 
         return $this->_item;

@@ -19,7 +19,29 @@
     <config>
         <fields name="params">
             <fieldset name="basic">
-                <!-- custom settings go here -->
+                <field
+                    name="endpoint"
+                    type="text"
+                    class="inputbox"
+                    label="COM_JHANDLE_PREFIX_ARCHIVE_ENDPOINT_LABEL"
+                    description="COM_JHANDLE_PREFIX_ARCHIVE_ENDPOINT_DESC"
+                    required="false"/>
+
+                <field
+                    name="username"
+                    type="text"
+                    class="inputbox"
+                    label="COM_JHANDLE_PREFIX_ARCHIVE_USERNAME_LABEL"
+                    description="COM_JHANDLE_PREFIX_ARCHIVE_USERNAME_DESC"
+                    required="false"/>
+
+                <field
+                    name="password"
+                    type="password"
+                    class="inputbox"
+                    label="COM_JHANDLE_PREFIX_ARCHIVE_PASSWORD_LABEL"
+                    description="COM_JHANDLE_PREFIX_ARCHIVE_PASSWORD_DESC"
+                    required="false"/>
             </fieldset>
         </fields>
     </config>

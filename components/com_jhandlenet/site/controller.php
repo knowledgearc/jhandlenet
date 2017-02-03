@@ -22,7 +22,7 @@ class JHandleNetController extends JControllerLegacy
         $item = $this->getModel('Handle')->getItem($handle);
 
         if (isset($item->data)) {
-            JFactory::getApplication()->redirect($item->url.'/index.php?option=com_jspace&task=resolve&id='.$item->data);
+            JFactory::getApplication()->redirect('index.php?option=com_jcar&view=item&id='.$item->data);
         } else {
             JError::raiseWarning(404, JText::_('COM_JHANDLENET_ORPHANED_HANDLE'));
         }

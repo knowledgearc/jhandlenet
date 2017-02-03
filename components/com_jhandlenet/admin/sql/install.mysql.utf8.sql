@@ -1,9 +1,5 @@
 CREATE TABLE IF NOT EXISTS #__jhandlenet_nas (
    `na` varchar(255) not null,
-   `url` varchar(255) not null,
-   `archive_endpoint` varchar(255),
-   `archive_username` varchar(255),
-   `archive_password` varchar(255),
    PRIMARY KEY(`na`)
 );
 

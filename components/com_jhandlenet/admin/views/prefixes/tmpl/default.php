@@ -19,14 +19,11 @@ $user = JFactory::getUser();
         <table class="table table-striped" id="prefixList">
             <thead>
                 <tr>
-                    <th width="1%" class="hidden-phone">
+                    <th width="1%" class="nowrap center">
                         <input type="checkbox" name="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
                     </th>
                     <th width="10%" class="nowrap">
                         <?php echo JText::_('Prefix'); ?>
-                    </th>
-                    <th class="nowrap">
-                        <?php echo JText::_('URL'); ?>
                     </th>
                     <th width="10%" class="nowrap">
                         <span class="pull-right"><?php echo JText::_('Stored Handles'); ?></span>
@@ -37,13 +34,12 @@ $user = JFactory::getUser();
             <tbody>
                 <?php foreach ($this->items as $i => $item) : ?>
                 <tr class="row<?php echo $i % 2; ?>">
-                    <td class="center hidden-phone">
+                    <td class="order nowrap center hidden-phone">
                         <?php echo JHtml::_('grid.id', $i, $item->na); ?>
                     </td>
                     <td width="10%">
                         <?php echo $item->na; ?>
                     </td>
-                    <td><?php echo $item->url; ?></td>
                     <td width="10%"><span class="pull-right"><?php echo $item->count; ?></span></td>
                 </tr>
                 <?php endforeach; ?>

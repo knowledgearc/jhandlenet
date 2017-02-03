@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <form>
-    <fieldset
-        addfieldpath="/administrator/components/com_jhandlenet/models/fields">
+    <fieldset>
         <field
             name="na"
             type="text"
@@ -9,37 +8,5 @@
             label="COM_JHANDLE_PREFIX_NA_LABEL"
             description="COM_JHANDLE_PREFIX_NA_DESC"
             required="true"/>
-
-        <field
-            name="url"
-            type="text"
-            class="inputbox"
-            label="COM_JHANDLE_PREFIX_URL_LABEL"
-            description="COM_JHANDLE_PREFIX_URL_DESC"
-            required="true"/>
-
-        <field
-            name="archive_endpoint"
-            type="text"
-            class="inputbox"
-            label="COM_JHANDLE_PREFIX_ARCHIVE_ENDPOINT_LABEL"
-            description="COM_JHANDLE_PREFIX_ARCHIVE_ENDPOINT_DESC"
-            required="false"/>
-
-        <field
-            name="archive_username"
-            type="text"
-            class="inputbox"
-            label="COM_JHANDLE_PREFIX_ARCHIVE_USERNAME_LABEL"
-            description="COM_JHANDLE_PREFIX_ARCHIVE_USERNAME_DESC"
-            required="false"/>
-
-        <field
-            name="archive_password"
-            type="text"
-            class="inputbox"
-            label="COM_JHANDLE_PREFIX_ARCHIVE_PASSWORD_LABEL"
-            description="COM_JHANDLE_PREFIX_ARCHIVE_PASSWORD_DESC"
-            required="false"/>
     </fieldset>
 </form>

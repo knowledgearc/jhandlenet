@@ -52,7 +52,7 @@ class JHandleNetModelPrefixes extends JModelList
 
         $query = $db->getQuery(true);
 
-        $select = array('a.na', 'a.url', 'COUNT(b.handle) AS count');
+        $select = array('a.na', 'COUNT(b.handle) AS count');
         $query
             ->select($select)
             ->from($db->quoteName('#__jhandlenet_nas') . ' AS a')
