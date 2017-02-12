@@ -54,7 +54,7 @@ class JHandleNetModelPrefix extends JModelAdmin
      *
      * @return  JTable  A JTable object
      */
-    public function getTable($type = 'NA', $prefix = 'JHandleNetTable', $config = array())
+    public function getTable($type = 'Na', $prefix = 'JHandleNetTable', $config = array())
     {
         return JTable::getInstance($type, $prefix, array('dbo'=>$this->getDbo()));
     }
@@ -114,72 +114,6 @@ class JHandleNetModelPrefix extends JModelAdmin
     protected function preprocessForm(JForm $form, $data, $group = 'jhandlenet')
     {
         parent::preprocessForm($form, $data, $group);
-    }
-
-    public function save($data)
-    {
-        $dispatcher = JDispatcher::getInstance();
-        $table = $this->getTable();
-        $key = $table->getKeyName();
-        $pk = (!empty($data[$key])) ? $data[$key] : (int) $this->getState($this->getName() . '.na');
-        $isNew = true;
-
-        JPluginHelper::importPlugin('content');
-
-        try {
-            // if we can load it then it already exists so let's update.
-            if ($table->load($pk)) {
-                $isNew = false;
-            }
-
-            // Bind the data.
-            if (!$table->bind($data)) {
-                $this->setError($table->getError());
-                return false;
-            }
-
-            // Prepare the row for saving
-            $this->prepareTable($table);
-
-            // Check the data.
-            if (!$table->check()) {
-                $this->setError($table->getError());
-                return false;
-            }
-
-            // Trigger the onContentBeforeSave event.
-            $result = $dispatcher->trigger($this->event_before_save, array($this->option . '.' . $this->name, &$table, $isNew));
-
-            if (in_array(false, $result, true)) {
-                $this->setError($table->getError());
-                return false;
-            }
-
-            // Store the data.
-            if (!$table->store()) {
-                $this->setError($table->getError());
-                return false;
-            }
-
-            // Clean the cache.
-            $this->cleanCache();
-
-            // Trigger the onContentAfterSave event.
-            $dispatcher->trigger($this->event_after_save, array($this->option . '.' . $this->name, &$table, $isNew));
-        } catch (Exception $e) {
-            $this->setError($e->getMessage());
-            return false;
-        }
-
-        $pkName = $table->getKeyName();
-
-        if (isset($table->$pkName)) {
-            $this->setState($this->getName() . '.na', $table->$pkName);
-        }
-
-        $this->setState($this->getName() . '.new', $isNew);
-
-        return true;
     }
 
     /**

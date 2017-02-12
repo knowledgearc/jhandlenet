@@ -56,12 +56,12 @@
     "storage_type" = "sql"
 
     sql_settings = {
-      sql_url = "jdbc:mysql://localhost/handle_net"
+      sql_url = "jdbc:mysql://localhost/%s"
       sql_driver = "com.mysql.jdbc.Driver"
       sql_login = "username"
       sql_passwd = "password"
       sql_read_only = "yes"
-      get_handle_stmt = "select h.idx, h.type, CONCAT('http://wijiti.net/index.php?option=com_jhandlenet&task=resolve&handle=', h.handle) AS data, h.ttl_type, h.ttl, h.timestamp, h.refs, h.admin_read, h.admin_write, h.pub_read, h.pub_write from handles AS h INNER JOIN nas AS n ON (n.na = h.na) WHERE h.handle = ?"
+      get_handle_stmt = "select h.idx, h.type, CONCAT('%s/index.php?option=com_jhandlenet&task=resolve&handle=', h.handle) AS data, h.ttl_type, h.ttl, h.timestamp, h.refs, h.admin_read, h.admin_write, h.pub_read, h.pub_write from handles AS h INNER JOIN nas AS n ON (n.na = h.na) WHERE h.handle = ?"
     }
   }
 }

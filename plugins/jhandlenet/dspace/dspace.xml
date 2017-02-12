@@ -20,7 +20,7 @@
         <fields name="params">
             <fieldset name="basic">
                 <field
-                    name="endpoint"
+                    name="url"
                     type="text"
                     class="inputbox"
                     label="COM_JHANDLE_PREFIX_ARCHIVE_ENDPOINT_LABEL"

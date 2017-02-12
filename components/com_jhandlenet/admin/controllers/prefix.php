@@ -220,6 +220,7 @@ class JHandleNetControllerPrefix extends JControllerForm
             return false;
         }
 
+
         // Attempt to save the data.
         if (!$model->save($validData))
         {

@@ -172,7 +172,7 @@ class JHandleNetCli extends JApplicationCli
 
         if ($table->load($na)) {
             if ($table->delete()) {
-                $this->out(JText::sprintf('Handle prefix %s unhomed.', $na), \JLog::DEBUG);
+                JHandleNetHelper::log(JText::sprintf('Handle prefix %s unhomed.', $na), \JLog::DEBUG);
             }
         } else {
             $this->out(JText::sprintf("Cannot unhome handle prefix %s. Prefix doesn't exists.", $na), \JLog::ERROR);
@@ -181,12 +181,17 @@ class JHandleNetCli extends JApplicationCli
 
     public function import()
     {
-        if (ArrayHelper::getValue($this->input->args, 1, null, 'word') == 'help') {
-            $this->out(JText::_("COM_JHANDLENET_CLI_IMPORT_HELP"));
+        $na = ArrayHelper::getValue($this->input->args, 1, null, 'word');
+
+        if ($na == "help") {
+            $this->out(JText::_("COM_JHANDLENET_CLI_PURGE_HELP"));
+            return;
         }
 
         try {
-            $this->fireEvent('onHandlesImport');
+            JHandleNetHelper::log(JText::_('importing handles...'), \JLog::DEBUG);
+
+            $this->fireEvent('onHandlesImport', array($na));
         } catch (Exception $e) {
             $this->out($e->getMessage(), \JLog::ERROR);
         }
@@ -205,7 +210,7 @@ class JHandleNetCli extends JApplicationCli
 
         $query = $db->getQuery(true);
 
-        $query->delete($db->qn('handles'));
+        $query->delete($db->qn('#__jhandlenet_handles'));
 
         if ($na) {
             $query->where($db->qn('na').'='.$db->q($na));
@@ -235,7 +240,7 @@ class JHandleNetCli extends JApplicationCli
     public function getTable()
     {
         JTable::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_jhandlenet/tables');
-        return JTable::getInstance('NA', 'JHandleNetTable', array());
+        return JTable::getInstance('Na', 'JHandleNetTable', array());
     }
 }
 

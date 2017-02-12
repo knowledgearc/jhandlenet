@@ -43,6 +43,13 @@
     <administration>
         <menu img="class:jhandlenet">com_jhandlenet</menu>
 
+        <submenu>
+            <menu link="option=com_jhandlenet" img="class:config"
+                  alt="JHandleNet/Prefixes">com_jhandlenet_prefixes</menu>
+            <menu link="option=com_jhandlenet&amp;view=config" img="class:config"
+                  alt="JHandleNet/Config">com_jhandlenet_config</menu>
+        </submenu>
+
         <files folder="admin">
             <folder>cli</folder>
             <folder>controllers</folder>

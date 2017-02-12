@@ -17,5 +17,6 @@ CREATE TABLE IF NOT EXISTS #__jhandlenet_handles (
     `pub_read` bool,
     `pub_write` bool,
     `na` varchar(255) not null,
+    `context` varchar(255) not null,
     PRIMARY KEY(`handle`, `idx`)
 );

@@ -1,6 +1,6 @@
 <?php
 /**
- * A class representing the "na" table.
+ * A class representing the "handle" table.
  *
  * @package    JHandleNet
  * @copyright  Copyright (C) 2013-2017 KnowledgeArc Ltd. All rights reserved.
@@ -8,11 +8,11 @@
  */
 defined('_JEXEC') or die;
 
-class JHandleNetTableNa extends JTable
+class JHandleNetTableHandle extends JTable
 {
     public function __construct(&$db)
     {
-        parent::__construct('#__jhandlenet_nas', 'na', $db);
+        parent::__construct('#__jhandlenet_handles', 'handle', $db);
 
         $this->_autoincrement = false;
     }
