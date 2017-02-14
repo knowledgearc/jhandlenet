@@ -1,13 +1,13 @@
-CREATE TABLE IF NOT EXISTS #__jhandlenet_nas (
+CREATE TABLE IF NOT EXISTS nas (
    `na` varchar(255) not null,
    PRIMARY KEY(`na`)
 );
 
-CREATE TABLE IF NOT EXISTS #__jhandlenet_handles (
+CREATE TABLE IF NOT EXISTS handles (
     `handle` varchar(255) not null,
     `idx` int not null,
     `type` blob,
-    `data` int,
+    `data` blob,
     `ttl_type` int,
     `ttl` int,
     `timestamp` int,

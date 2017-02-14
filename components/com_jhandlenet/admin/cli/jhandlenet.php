@@ -191,7 +191,7 @@ class JHandleNetCli extends JApplicationCli
         try {
             JHandleNetHelper::log(JText::_('importing handles...'), \JLog::DEBUG);
 
-            $this->fireEvent('onHandlesImport', array($na));
+            $this->fireEvent('onHandlesImport');
         } catch (Exception $e) {
             $this->out($e->getMessage(), \JLog::ERROR);
         }
@@ -210,7 +210,7 @@ class JHandleNetCli extends JApplicationCli
 
         $query = $db->getQuery(true);
 
-        $query->delete($db->qn('#__jhandlenet_handles'));
+        $query->delete($db->qn('handles'));
 
         if ($na) {
             $query->where($db->qn('na').'='.$db->q($na));

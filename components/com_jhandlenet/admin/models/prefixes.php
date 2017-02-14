@@ -55,8 +55,8 @@ class JHandleNetModelPrefixes extends JModelList
         $select = array('a.na', 'COUNT(b.handle) AS count');
         $query
             ->select($select)
-            ->from($db->quoteName('#__jhandlenet_nas') . ' AS a')
-            ->join('left', $db->quoteName('#__jhandlenet_handles') . ' AS b ON a.na = b.na')
+            ->from($db->quoteName('nas') . ' AS a')
+            ->join('left', $db->quoteName('handles') . ' AS b ON a.na = b.na')
             ->group('na');
 
         return $query;

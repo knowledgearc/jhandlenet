@@ -15,7 +15,7 @@ $db = $config->db;
 $dbUser = $config->user;
 $dbPassword = $config->password;
 $dbPrefix = $config->dbprefix;
-$url = JFactory::getUri()->base();
+$url = JFactory::getUri()->root();
 ?>
 
 <label><?php echo JText::_("COM_JHANDLENET_CONFIG_DCT_LABEL"); ?></label>

@@ -13,7 +13,7 @@
 
     <files folder="packages">
         <file type="component" id="com_jhandlenet" >com_jhandlenet.zip</file>
-        <file type="plugin" id="jhandlenet" group="content">plg_jhandlenet_dspace.zip</file>
+        <file type="plugin" id="dspace" group="jhandlenet">plg_jhandlenet_dspace.zip</file>
     </files>
 
     <updateservers>

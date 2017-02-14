@@ -42,14 +42,10 @@ class PlgJHandleNetDSpace extends JPlugin
         return $this->na;
     }
 
-    public function onHandlesImport($na)
+    public function onHandlesImport()
     {
         $timestamp = JFactory::getDate();
 
-        if (!$this->getNa()->load($na)) {
-            throw new Exception('No such naming authority.');
-        }
-echo $timestamp->toUnix();
         $start = 0;
         $limit = 1000;
         $total = $this->getTotal();
@@ -59,30 +55,35 @@ echo $timestamp->toUnix();
 
             foreach ($items as $item) {
                 $handle = $item->handle;
-                $id = $item->{"search.resourceid"};
+                $na = JArrayHelper::getValue(explode('/', $handle), 0);
+                $id = "dspace:".$item->{"search.resourceid"};
 
-                $table = JTable::getInstance('Handle', 'JHandleNetTable', array());
-                $table->load($handle);
+                if ($this->getNa()->load($na)) {
+                    $table = JTable::getInstance('Handle', 'JHandleNetTable', array());
+                    $table->load($handle);
 
-                $table->handle = $handle;                   // handle
-                $table->idx = "1";                          // idx (always 1 for this type of handle)
-                $table->type = "'URL'";                     // type (always URL)
-                $table->data = $id;                         // data (should only be the id of the actual item)
-                $table->ttl_type = '0';                     // ttl_type (always 0)
-                $table->ttl = '86400';                      // ttl
-                $table->timestamp = $timestamp->toUnix();   // timestamp (NOW())
-                $table->refs = "''";                        // refs (empty string)
-                $table->admin_read = '1';                   // admin_read (always 1)
-                $table->admin_write = '0';                  // admin_write (should be 0 to stop handle.net writing to the db)
-                $table->pub_read = '1';                     // pub_read (always 1)
-                $table->pub_write = '0';                    // pub_write (always 0)
-                $table->na = $na;                           // na
-                $table->context = "jcar.item";              // context
+                    $table->handle = $handle;       // handle
+                    $table->idx = "1";              // idx (always 1 for this type of handle)
+                    $table->type = "URL";           // type (always URL)
+                    $table->data = $id;             // data (should only be the id of the actual item)
+                    $table->ttl_type = '0';         // ttl_type (always 0)
+                    $table->ttl = '86400';          // ttl
+                    $table->timestamp = $timestamp->toUnix();   // timestamp (NOW())
+                    $table->refs = "";              // refs (empty string)
+                    $table->admin_read = '1';       // admin_read (always 1)
+                    $table->admin_write = '0';      // admin_write (should be 0 to stop handle.net writing to the db)
+                    $table->pub_read = '1';         // pub_read (always 1)
+                    $table->pub_write = '0';        // pub_write (always 0)
+                    $table->na = $na;               // na
+                    $table->context = "jcar.item";  // context
 
-                if ($table->store()) {
-                    JHandleNetHelper::log(JText::sprintf("handle %s imported", $handle), \JLog::DEBUG);
+                    if ($table->store()) {
+                        JHandleNetHelper::log(JText::sprintf("handle %s imported", $handle), \JLog::DEBUG);
+                    } else {
+                        JHandleNetHelper::log($table->getError(), \JLog::ERROR);
+                    }
                 } else {
-                    JHandleNetHelper::log($table->getError(), \JLog::ERROR);
+                    JHandleNetHelper::log(JText::sprintf("Naming authority %s doesn't exist for handle %s. Ignoring...", $na, $handle), \JLog::DEBUG);
                 }
 
                 $start++;
@@ -94,19 +95,36 @@ echo $timestamp->toUnix();
         $query = $db->getQuery(true);
 
         $query
-            ->delete($db->qn("#__jhandlenet_handles"))
+            ->select('COUNT(handle)')
+            ->from($db->qn("handles"))
             ->where("NOT ".$db->qn('timestamp')." = '".$timestamp->toUnix()."'");
 
-        $db->setQuery($query)->execute();
+        $count = $db->setQuery($query)->loadResult();
+
+        if ($count > 0) {
+            JHandleNetHelper::log(JText::sprintf("deleting %s stale handles...", $count), \JLog::DEBUG);
+
+            $query = $db->getQuery(true);
+
+            $query
+                ->delete($db->qn("handles"))
+                ->where("NOT ".$db->qn('timestamp')." = '".$timestamp->toUnix()."'");
+
+            $db->setQuery($query)->execute();
+        }
     }
 
     public function onHandleResolve($item)
     {
         if ($item->context == 'jcar.item') {
-            return JCarHelperRoute::getItemRoute($item->data);
-        } else {
-            return false;
+            require_once(JPATH_ROOT."/components/com_jcar/helpers/route.php");
+
+            if (class_exists("JCarHelperRoute")) {
+                return JCarHelperRoute::getItemRoute($item->data);
+            }
         }
+
+        return false;
     }
 
     /**

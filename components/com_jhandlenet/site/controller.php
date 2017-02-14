@@ -26,11 +26,11 @@ class JHandleNetController extends JControllerLegacy
 
             JPluginHelper::importPlugin("jhandlenet", null, true, $dispatcher);
 
-            $return = $dispatcher->trigger('onHandleResolve', $item);
+            $return = $dispatcher->trigger('onHandleResolve', array($item));
 
             $url = array_pop($return);
 
-            JFactory::getApplication()->redirect($url);
+            JFactory::getApplication()->redirect(JRoute::_($url));
         } else {
             JError::raiseWarning(404, JText::_('COM_JHANDLENET_ORPHANED_HANDLE'));
         }

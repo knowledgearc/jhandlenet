@@ -12,7 +12,7 @@ class JHandleNetTableHandle extends JTable
 {
     public function __construct(&$db)
     {
-        parent::__construct('#__jhandlenet_handles', 'handle', $db);
+        parent::__construct('handles', 'handle', $db);
 
         $this->_autoincrement = false;
     }

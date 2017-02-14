@@ -63,8 +63,8 @@ class JHandleNetModelHandle extends JModelItem
             $query = $db->getQuery(true);
             $query
                 ->select('a.*')
-                ->from('#__jhandlenet_handles AS a')
-                ->join('inner', '#__jhandlenet_nas as b ON (a.na = b.na)')
+                ->from('handles AS a')
+                ->join('inner', 'nas as b ON (a.na = b.na)')
                 ->where("handle='".$id."'");
 
             $db->setQuery($query);
